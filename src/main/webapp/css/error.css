@@ -1,0 +1,73 @@
+/* ========================================
+   에러 페이지 스타일 (Error Page Styles)
+   ======================================== */
+
+body {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: white;
+  text-align: center;
+  padding: 20px;
+}
+
+/* 500 에러 페이지용 색상 */
+body.error-500 {
+  background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+}
+
+body.error-500 .error-container a {
+  color: #f5576c;
+}
+
+.error-container {
+  background: rgba(0, 0, 0, 0.2);
+  padding: 40px;
+  border-radius: 10px;
+  max-width: 600px;
+  width: 100%;
+}
+
+.error-container h1 {
+  font-size: 72px;
+  margin-bottom: 10px;
+}
+
+.error-container p {
+  font-size: 18px;
+  margin-bottom: 30px;
+  opacity: 0.9;
+}
+
+.error-container a {
+  display: inline-block;
+  padding: 12px 30px;
+  background: white;
+  color: #667eea;
+  text-decoration: none;
+  border-radius: 5px;
+  font-weight: 500;
+  transition: all 0.3s;
+}
+
+.error-container a:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+}
+
+/* 반응형 */
+@media (max-width: 600px) {
+  .error-container {
+    padding: 30px 20px;
+  }
+
+  .error-container h1 {
+    font-size: 48px;
+  }
+
+  .error-container p {
+    font-size: 16px;
+  }
+}
