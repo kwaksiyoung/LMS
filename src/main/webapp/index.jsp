@@ -254,7 +254,7 @@
     <nav class="navbar">
         <div class="navbar-container">
             <a href="<%= request.getContextPath() %>/" class="navbar-logo">
-                📚 LMS
+                📚 LMS(Tester1@#****)
             </a>
 
             <% if (isLoggedIn) { %>
