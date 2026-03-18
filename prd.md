@@ -94,6 +94,49 @@ REST API (병렬 운영):
   CourseService.java           → 공통 비즈니스 로직 (두 컨트롤러가 공유)
 ```
 
+### 3.4.2 JSP 파일 생성 규칙 (스타일 분리)
+
+**모든 JSP 파일은 CSS를 분리하여 외부 파일에서 참조**한다.
+
+**금지:**
+```jsp
+<!-- ❌ 절대 금지 -->
+<head>
+  <style>
+    body { ... }
+    .class { ... }
+  </style>
+</head>
+```
+
+**필수:**
+```jsp
+<!-- ✅ 필수 -->
+<head>
+  <link rel="stylesheet" href="<%= request.getContextPath() %>/css/common.css">
+  <link rel="stylesheet" href="<%= request.getContextPath() %>/css/page-name.css">
+</head>
+```
+
+**CSS 파일 구조:**
+- `/css/common.css` — 모든 페이지의 공통 스타일 (초기화, 기본 폼, 버튼, 알림 등)
+- `/css/{page-name}.css` — 해당 페이지 전용 스타일
+
+**예시:**
+| JSP 파일 | 참조 CSS |
+|---------|---------|
+| login.jsp | common.css + login.css |
+| register.jsp | common.css + register.css |
+| content/list.jsp | common.css + content.css |
+| content/create.jsp | common.css + content.css |
+| user/myinfo.jsp | common.css + myinfo.css |
+
+**효과:**
+- 유지보수성 향상 (CSS 중앙집중식 관리)
+- 파일 크기 감소 (캐시 활용)
+- 코드 재사용 (공통 CSS 활용)
+- 반응형 디자인 통일
+
 ### 3.5 파일 업로드
 
 - **드래그 앤 드롭** 지원 (HTML5 File API)
