@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xsi:schemaLocation="
+           http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd">
+
+    <!-- ========================================
+         DataSource 설정 (MariaDB)
+         ======================================== -->
+
+    <!-- MariaDB DataSource (DBCP2) -->
+    <bean id="dataSource" class="org.apache.commons.dbcp2.BasicDataSource" destroy-method="close">
+        <property name="driverClassName" value="${db.driver}"/>
+        <property name="url" value="${db.url}"/>
+        <property name="username" value="${db.username}"/>
+        <property name="password" value="${db.password}"/>
+        
+        <!-- 연결 풀 설정 -->
+        <property name="initialSize" value="${db.initialSize:5}"/>
+        <property name="maxTotal" value="${db.maxTotal:20}"/>
+        <property name="maxIdle" value="${db.maxIdle:10}"/>
+        <property name="minIdle" value="${db.minIdle:5}"/>
+        <property name="maxWaitMillis" value="${db.maxWaitMillis:30000}"/>
+        <property name="validationQuery" value="SELECT 1"/>
+        <property name="testOnBorrow" value="true"/>
+        <property name="testWhileIdle" value="true"/>
+        <property name="timeBetweenEvictionRunsMillis" value="30000"/>
+    </bean>
+
+    <!-- SqlSessionFactory 설정 (MyBatis) -->
+    <bean id="sqlSessionFactory" class="org.mybatis.spring.SqlSessionFactoryBean">
+        <property name="dataSource" ref="dataSource"/>
+        <property name="configLocation" value="classpath:egovframework/sqlmap/sql-map-config.xml"/>
+        <property name="mapperLocations" value="classpath:egovframework/sqlmap/*-mapper.xml"/>
+    </bean>
+
+    <!-- SqlSession Template -->
+    <bean id="sqlSession" class="org.mybatis.spring.SqlSessionTemplate">
+        <constructor-arg ref="sqlSessionFactory"/>
+    </bean>
+
+    <!-- Transaction Manager -->
+    <bean id="transactionManager" class="org.springframework.jdbc.datasource.DataSourceTransactionManager">
+        <property name="dataSource" ref="dataSource"/>
+    </bean>
+
+    <!-- MyBatis Mapper Scanner 설정 -->
+    <!-- @Mapper 애노테이션이 있는 인터페이스를 Spring 빈으로 등록 -->
+    <bean class="org.mybatis.spring.mapper.MapperScannerConfigurer">
+        <property name="basePackage" value="kr.co.lms.mapper"/>
+        <property name="sqlSessionFactoryBeanName" value="sqlSessionFactory"/>
+        <property name="annotationClass" value="org.apache.ibatis.annotations.Mapper"/>
+    </bean>
+
+</beans>

@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE configuration PUBLIC "-//mybatis.org//DTD Config 3.0//EN"
+    "http://mybatis.org/dtd/mybatis-3-config.dtd">
+
+<configuration>
+
+    <!-- ========================================
+         MyBatis 전역 설정
+         ======================================== -->
+
+    <settings>
+        <!-- SQL 로깅 활성화 (개발 환경) - SLF4J 키워드 사용 -->
+        <setting name="logImpl" value="SLF4J"/>
+        
+        <!-- Lazy Loading -->
+        <setting name="lazyLoadingEnabled" value="true"/>
+        <setting name="aggressiveLazyLoading" value="false"/>
+        
+        <!-- SQL 결과 매핑 시 null 값도 매핑 -->
+        <setting name="callSettersOnNulls" value="true"/>
+        
+        <!-- camelCase → snake_case 자동 변환 -->
+        <setting name="mapUnderscoreToCamelCase" value="true"/>
+        
+        <!-- 쿼리 결과 캐시 -->
+        <setting name="cacheEnabled" value="true"/>
+        
+        <!-- Prepared Statement 사용 -->
+        <setting name="defaultStatementTimeout" value="30"/>
+    </settings>
+
+    <!-- ========================================
+         Type Aliases (VO 클래스 별칭)
+         kr.co.lms.vo 패키지 전체 자동 등록
+         - 클래스명이 그대로 alias로 사용됨 (예: UserVO → UserVO)
+         - 새 VO 추가 시 자동으로 등록됨
+         ======================================== -->
+    <typeAliases>
+        <package name="kr.co.lms.vo"/>
+    </typeAliases>
+
+    <!-- ========================================
+         Type Handlers (커스텀 데이터 타입)
+         ======================================== -->
+    <!-- 예: 암호화된 문자열 처리 등 -->
+
+</configuration>

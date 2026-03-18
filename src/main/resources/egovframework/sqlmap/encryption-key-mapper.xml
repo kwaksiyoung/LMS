@@ -1,0 +1,97 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="kr.co.lms.mapper.EncryptionKeyMapper">
+    
+    <!-- 활성 암호화 키 조회 (테넌트별) -->
+    <select id="selectActiveKeyByTenant" parameterType="String" resultType="EncryptionKeyVO">
+        SELECT key_id as keyId, 
+               tenant_id as tenantId, 
+               key_name as keyName, 
+               encrypted_key as encryptedKey, 
+               algorithm, 
+               key_size as keySize, 
+               is_active as isActive, 
+               rotation_policy as rotationPolicy, 
+               rotated_dt as rotatedDt, 
+               reg_dt as regDt, 
+               upd_dt as updDt
+        FROM tb_encryption_key
+        WHERE tenant_id = #{tenantId}
+        AND is_active = 'Y'
+        LIMIT 1
+    </select>
+    
+    <!-- 특정 버전의 암호화 키 조회 -->
+    <select id="selectKeyByTenantAndName" parameterType="map" resultType="EncryptionKeyVO">
+        SELECT key_id as keyId, 
+               tenant_id as tenantId, 
+               key_name as keyName, 
+               encrypted_key as encryptedKey, 
+               algorithm, 
+               key_size as keySize, 
+               is_active as isActive, 
+               rotation_policy as rotationPolicy, 
+               rotated_dt as rotatedDt, 
+               reg_dt as regDt, 
+               upd_dt as updDt
+        FROM tb_encryption_key
+        WHERE tenant_id = #{tenantId}
+        AND key_name = #{keyName}
+        LIMIT 1
+    </select>
+    
+    <!-- 암호화 키 등록 -->
+    <insert id="insertEncryptionKey" parameterType="EncryptionKeyVO">
+        INSERT INTO tb_encryption_key 
+        (key_id, tenant_id, key_name, encrypted_key, algorithm, key_size, is_active, rotation_policy, reg_dt, upd_dt)
+        VALUES 
+        (
+            UUID(), 
+            #{tenantId}, 
+            #{keyName}, 
+            #{encryptedKey}, 
+            #{algorithm}, 
+            #{keySize}, 
+            #{isActive}, 
+            #{rotationPolicy}, 
+            NOW(), 
+            NOW()
+        )
+    </insert>
+    
+    <!-- 암호화 키 활성 상태 변경 -->
+    <update id="updateKeyActiveStatus">
+        UPDATE tb_encryption_key
+        SET is_active = #{isActive},
+            upd_dt = NOW()
+        WHERE key_id = #{keyId}
+    </update>
+    
+    <!-- 암호화 키 로테이션 정보 업데이트 -->
+    <update id="updateKeyRotationInfo" parameterType="EncryptionKeyVO">
+        UPDATE tb_encryption_key
+        SET rotated_dt = #{rotatedDt},
+            rotation_policy = #{rotationPolicy},
+            upd_dt = NOW()
+        WHERE key_id = #{keyId}
+    </update>
+    
+    <!-- 암호화 키 조회 (키 ID로) -->
+    <select id="selectKeyById" parameterType="String" resultType="EncryptionKeyVO">
+        SELECT key_id as keyId, 
+               tenant_id as tenantId, 
+               key_name as keyName, 
+               encrypted_key as encryptedKey, 
+               algorithm, 
+               key_size as keySize, 
+               is_active as isActive, 
+               rotation_policy as rotationPolicy, 
+               rotated_dt as rotatedDt, 
+               reg_dt as regDt, 
+               upd_dt as updDt
+        FROM tb_encryption_key
+        WHERE key_id = #{keyId}
+        LIMIT 1
+    </select>
+</mapper>

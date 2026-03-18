@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>LMS - Learning Management System</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .container {
+            background: white;
+            border-radius: 10px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.1);
+            padding: 40px;
+            text-align: center;
+            max-width: 600px;
+        }
+        h1 {
+            color: #333;
+            margin-bottom: 10px;
+        }
+        .version {
+            color: #999;
+            font-size: 14px;
+            margin-bottom: 30px;
+        }
+        .status {
+            background: #f0f0f0;
+            border-left: 4px solid #4CAF50;
+            padding: 15px;
+            margin: 20px 0;
+            text-align: left;
+            border-radius: 4px;
+        }
+        .status h3 {
+            color: #4CAF50;
+            margin-bottom: 10px;
+        }
+        .status ul {
+            list-style: none;
+            font-size: 14px;
+            line-height: 1.8;
+        }
+        .status li {
+            color: #666;
+        }
+        .status li:before {
+            content: "✓ ";
+            color: #4CAF50;
+            font-weight: bold;
+            margin-right: 5px;
+        }
+        .links {
+            margin-top: 30px;
+        }
+        .btn {
+            display: inline-block;
+            padding: 10px 20px;
+            margin: 0 10px;
+            border-radius: 5px;
+            text-decoration: none;
+            font-weight: 500;
+            transition: all 0.3s;
+            border: none;
+            cursor: pointer;
+        }
+        .btn-primary {
+            background: #667eea;
+            color: white;
+        }
+        .btn-primary:hover {
+            background: #5568d3;
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
+        }
+        .btn-secondary {
+            background: #f0f0f0;
+            color: #333;
+        }
+        .btn-secondary:hover {
+            background: #e0e0e0;
+        }
+        .footer {
+            margin-top: 30px;
+            color: #999;
+            font-size: 12px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>📚 LMS</h1>
+        <p class="version">Learning Management System v1.0.0</p>
+
+        <div class="status">
+            <h3>✓ 초기화 완료</h3>
+            <ul>
+                <li>Spring Framework 5.3.27</li>
+                <li>eGovFrame 4.2.0</li>
+                <li>MariaDB 데이터베이스 연동 준비</li>
+                <li>AES-256-GCM 회원정보 암호화</li>
+                <li>REST API 기반 아키텍처</li>
+            </ul>
+        </div>
+
+        <div class="links">
+            <a href="/LMS/login" class="btn btn-primary">로그인</a>
+            <a href="/LMS/content/list" class="btn btn-secondary">콘텐츠 관리</a>
+            <a href="/LMS/api/v1/health" class="btn btn-secondary">API 상태</a>
+        </div>
+        
+        <div style="margin-top: 20px; padding-top: 20px; border-top: 1px solid #ddd;">
+            <p style="color: #999; font-size: 12px; margin-bottom: 10px;">⚙️ 관리자 기능 (로그인 필수)</p>
+            <a href="/LMS/content/create" class="btn btn-secondary" style="padding: 8px 15px; font-size: 13px;">새 콘텐츠 등록</a>
+        </div>
+
+        <div class="footer">
+            <p>© 2026 Learning Management System. All rights reserved.</p>
+        </div>
+    </div>
+</body>
+</html>

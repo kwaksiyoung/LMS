@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:context="http://www.springframework.org/schema/context"
+       xsi:schemaLocation="
+            http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
+            http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context.xsd">
+
+    <!-- ========================================
+         공통 설정 (Component Scan 등)
+         ======================================== -->
+
+    <!-- Property Placeholder 설정 (Component Scan 전에 먼저 실행) -->
+    <!-- CRITICAL: 이것이 먼저 실행되어야 @Value 주입이 작동합니다 -->
+    <context:property-placeholder 
+        location="classpath:application.properties" 
+        ignore-unresolvable="false"
+        system-properties-mode="OVERRIDE"/>
+
+    <!-- Component Scan 설정 -->
+    <!-- Root Context에서: Controller/RestController는 제외, Service/Config는 포함 -->
+    <context:component-scan base-package="kr.co.lms">
+        <!-- DispatcherServlet Context에서 로드할 것들은 제외 -->
+        <context:exclude-filter type="annotation" expression="org.springframework.stereotype.Controller"/>
+        <context:exclude-filter type="annotation" expression="org.springframework.web.bind.annotation.RestController"/>
+    </context:component-scan>
+
+</beans>

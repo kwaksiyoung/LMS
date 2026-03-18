@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="kr.co.lms.mapper.MenuMapper">
+    
+    <!-- 메뉴 조회 -->
+    <select id="selectMenu" parameterType="String" resultType="MenuVO">
+        SELECT menu_id, menu_nm, menu_url, menu_icon, sort_order, parent_menu_id, use_yn, reg_dt, upd_dt
+        FROM tb_menu
+        WHERE menu_id = #{menuId}
+        AND use_yn = 'Y'
+    </select>
+    
+    <!-- 메뉴 목록 조회 -->
+    <select id="selectMenuList" parameterType="MenuVO" resultType="MenuVO">
+        SELECT menu_id, menu_nm, menu_url, menu_icon, sort_order, parent_menu_id, use_yn, reg_dt, upd_dt
+        FROM tb_menu
+        WHERE 1=1
+        <if test="useYn != null and useYn != ''">
+            AND use_yn = #{useYn}
+        </if>
+        ORDER BY sort_order ASC, reg_dt DESC
+    </select>
+    
+    <!-- 메뉴 등록 -->
+    <insert id="insertMenu" parameterType="MenuVO">
+        INSERT INTO tb_menu (menu_id, menu_nm, menu_url, menu_icon, sort_order, parent_menu_id, use_yn, reg_dt, upd_dt)
+        VALUES (#{menuId}, #{menuNm}, #{menuUrl}, #{menuIcon}, #{sortOrder}, #{parentMenuId}, #{useYn}, NOW(), NOW())
+    </insert>
+    
+    <!-- 메뉴 수정 -->
+    <update id="updateMenu" parameterType="MenuVO">
+        UPDATE tb_menu
+        SET menu_nm = #{menuNm},
+            menu_url = #{menuUrl},
+            menu_icon = #{menuIcon},
+            sort_order = #{sortOrder},
+            parent_menu_id = #{parentMenuId},
+            use_yn = #{useYn},
+            upd_dt = NOW()
+        WHERE menu_id = #{menuId}
+    </update>
+    
+    <!-- 메뉴 삭제 -->
+    <delete id="deleteMenu" parameterType="String">
+        UPDATE tb_menu
+        SET use_yn = 'N',
+            upd_dt = NOW()
+        WHERE menu_id = #{menuId}
+    </delete>
+    
+    <!-- 메뉴 수 조회 -->
+    <select id="selectMenuCount" parameterType="MenuVO" resultType="int">
+        SELECT COUNT(*)
+        FROM tb_menu
+        WHERE 1=1
+        <if test="useYn != null and useYn != ''">
+            AND use_yn = #{useYn}
+        </if>
+    </select>
+</mapper>

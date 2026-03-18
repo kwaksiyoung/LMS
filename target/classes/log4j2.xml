@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Configuration packages="kr.co.lms">
+    <Properties>
+        <Property name="log.path">${sys:user.dir}/logs</Property>
+        <Property name="log.pattern">%d{yyyy-MM-dd HH:mm:ss.SSS} [%t] %-5level %c{1} - %m%n</Property>
+    </Properties>
+
+    <Appenders>
+        <!-- 콘솔 출력 -->
+        <Console name="Console" target="SYSTEM_OUT">
+            <PatternLayout pattern="${log.pattern}"/>
+        </Console>
+
+        <!-- 파일 로깅 (일별 롤링) -->
+        <RollingFile name="RollingFile" 
+                     fileName="${log.path}/lms.log"
+                     filePattern="${log.path}/lms-%d{yyyy-MM-dd}.%i.log">
+            <PatternLayout pattern="${log.pattern}"/>
+            <Policies>
+                <TimeBasedTriggeringPolicy interval="1" modulate="true"/>
+                <SizeBasedTriggeringPolicy size="100MB"/>
+            </Policies>
+            <DefaultRolloverStrategy max="30"/>
+        </RollingFile>
+
+        <!-- 에러 파일 로깅 -->
+        <RollingFile name="ErrorFile"
+                     fileName="${log.path}/error.log"
+                     filePattern="${log.path}/error-%d{yyyy-MM-dd}.%i.log">
+            <PatternLayout pattern="${log.pattern}"/>
+            <Policies>
+                <TimeBasedTriggeringPolicy interval="1" modulate="true"/>
+                <SizeBasedTriggeringPolicy size="100MB"/>
+            </Policies>
+            <DefaultRolloverStrategy max="30"/>
+        </RollingFile>
+    </Appenders>
+
+    <Loggers>
+        <!-- 개발 환경: DEBUG, 운영 환경: INFO -->
+        <Logger name="kr.co.lms" level="DEBUG"/>
+        <Logger name="org.springframework" level="INFO"/>
+        <Logger name="org.springframework.security" level="DEBUG"/>
+        <Logger name="org.mybatis" level="INFO"/>
+
+        <!-- 루트 로거 -->
+        <Root level="INFO">
+            <AppenderRef ref="Console"/>
+            <AppenderRef ref="RollingFile"/>
+            <AppenderRef ref="ErrorFile" level="ERROR"/>
+        </Root>
+    </Loggers>
+</Configuration>

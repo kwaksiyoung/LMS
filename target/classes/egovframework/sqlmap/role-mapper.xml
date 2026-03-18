@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="kr.co.lms.mapper.RoleMapper">
+    
+    <!-- 역할 전체 조회 -->
+    <select id="selectRole" parameterType="String" resultType="RoleVO">
+        SELECT role_cd, role_nm, role_desc, use_yn, reg_dt, upd_dt
+        FROM tb_role
+        WHERE role_cd = #{roleCd}
+        AND use_yn = 'Y'
+    </select>
+    
+    <!-- 역할 목록 조회 -->
+    <select id="selectRoleList" parameterType="RoleVO" resultType="RoleVO">
+        SELECT role_cd, role_nm, role_desc, use_yn, reg_dt, upd_dt
+        FROM tb_role
+        WHERE 1=1
+        <if test="useYn != null and useYn != ''">
+            AND use_yn = #{useYn}
+        </if>
+        ORDER BY reg_dt DESC
+    </select>
+    
+    <!-- 역할 등록 -->
+    <insert id="insertRole" parameterType="RoleVO">
+        INSERT INTO tb_role (role_cd, role_nm, role_desc, use_yn, reg_dt, upd_dt)
+        VALUES (#{roleCd}, #{roleNm}, #{roleDesc}, #{useYn}, NOW(), NOW())
+    </insert>
+    
+    <!-- 역할 수정 -->
+    <update id="updateRole" parameterType="RoleVO">
+        UPDATE tb_role
+        SET role_nm = #{roleNm},
+            role_desc = #{roleDesc},
+            use_yn = #{useYn},
+            upd_dt = NOW()
+        WHERE role_cd = #{roleCd}
+    </update>
+    
+    <!-- 역할 삭제 -->
+    <delete id="deleteRole" parameterType="String">
+        UPDATE tb_role
+        SET use_yn = 'N',
+            upd_dt = NOW()
+        WHERE role_cd = #{roleCd}
+    </delete>
+    
+    <!-- 역할 수 조회 -->
+    <select id="selectRoleCount" parameterType="RoleVO" resultType="int">
+        SELECT COUNT(*)
+        FROM tb_role
+        WHERE 1=1
+        <if test="useYn != null and useYn != ''">
+            AND use_yn = #{useYn}
+        </if>
+    </select>
+</mapper>

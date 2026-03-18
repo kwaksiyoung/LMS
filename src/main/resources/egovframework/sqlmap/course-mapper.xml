@@ -1,0 +1,126 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+    "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="kr.co.lms.mapper.CourseMapper">
+
+    <!-- ============================================
+         과정 VO 매핑
+         ============================================ -->
+    <resultMap id="courseMap" type="CourseVO">
+        <id column="course_id" property="courseId"/>
+        <result column="course_nm" property="courseNm"/>
+        <result column="course_desc" property="courseDesc"/>
+        <result column="instructor_id" property="instructorId"/>
+        <result column="instructor_nm" property="instructorNm"/>
+        <result column="start_dt" property="startDt"/>
+        <result column="end_dt" property="endDt"/>
+        <result column="max_students" property="maxStudents"/>
+        <result column="current_students" property="currentStudents"/>
+        <result column="status" property="status"/>
+        <result column="use_yn" property="useYn"/>
+        <result column="reg_dt" property="regDt"/>
+        <result column="upd_dt" property="updDt"/>
+    </resultMap>
+
+    <!-- ============================================
+         과정 조회 (ID로)
+         ============================================ -->
+    <select id="selectCourse" parameterType="string" resultMap="courseMap">
+        SELECT c.course_id, c.course_nm, c.course_desc, c.instructor_id, u.user_nm as instructor_nm,
+               c.start_dt, c.end_dt, c.max_students, c.status, c.use_yn, c.reg_dt, c.upd_dt
+        FROM tb_course c
+        LEFT JOIN tb_user u ON c.instructor_id = u.user_id
+        WHERE c.course_id = #{courseId}
+    </select>
+
+    <!-- ============================================
+         과정 목록 조회
+         ============================================ -->
+    <select id="selectCourseList" parameterType="CourseVO" resultMap="courseMap">
+        SELECT c.course_id, c.course_nm, c.course_desc, c.instructor_id, u.user_nm as instructor_nm,
+               c.start_dt, c.end_dt, c.max_students, c.status, c.use_yn, c.reg_dt, c.upd_dt
+        FROM tb_course c
+        LEFT JOIN tb_user u ON c.instructor_id = u.user_id
+        WHERE 1=1
+        <if test="status != null and status != ''">
+            AND c.status = #{status}
+        </if>
+        <if test="instructorId != null and instructorId != ''">
+            AND c.instructor_id = #{instructorId}
+        </if>
+        <if test="useYn != null and useYn != ''">
+            AND c.use_yn = #{useYn}
+        </if>
+        ORDER BY c.reg_dt DESC
+    </select>
+
+    <!-- ============================================
+         과정 등록
+         ============================================ -->
+    <insert id="insertCourse" parameterType="CourseVO">
+        INSERT INTO tb_course (course_id, course_nm, course_desc, instructor_id, start_dt, end_dt, 
+                              max_students, status, use_yn, reg_dt, upd_dt)
+        VALUES (#{courseId}, #{courseNm}, #{courseDesc}, #{instructorId}, #{startDt}, #{endDt}, 
+                #{maxStudents}, 'DRAFT', 'Y', NOW(), NOW())
+    </insert>
+
+    <!-- ============================================
+         과정 수정
+         ============================================ -->
+    <update id="updateCourse" parameterType="CourseVO">
+        UPDATE tb_course
+        SET course_nm = #{courseNm},
+            course_desc = #{courseDesc},
+            start_dt = #{startDt},
+            end_dt = #{endDt},
+            max_students = #{maxStudents},
+            upd_dt = NOW()
+        WHERE course_id = #{courseId}
+    </update>
+
+    <!-- ============================================
+         과정 삭제
+         ============================================ -->
+    <delete id="deleteCourse" parameterType="string">
+        UPDATE tb_course
+        SET use_yn = 'N', upd_dt = NOW()
+        WHERE course_id = #{courseId}
+    </delete>
+
+    <!-- ============================================
+         과정 수 조회
+         ============================================ -->
+    <select id="selectCourseCount" parameterType="CourseVO" resultType="int">
+        SELECT COUNT(*)
+        FROM tb_course
+        WHERE 1=1
+        <if test="status != null and status != ''">
+            AND status = #{status}
+        </if>
+        <if test="useYn != null and useYn != ''">
+            AND use_yn = #{useYn}
+        </if>
+    </select>
+
+    <!-- ============================================
+         강사별 과정 목록 조회
+         ============================================ -->
+    <select id="selectCourseListByInstructor" parameterType="string" resultMap="courseMap">
+        SELECT course_id, course_nm, course_desc, instructor_id, start_dt, end_dt, 
+               max_students, status, use_yn, reg_dt, upd_dt
+        FROM tb_course
+        WHERE instructor_id = #{instructorId} AND use_yn = 'Y'
+        ORDER BY reg_dt DESC
+    </select>
+
+    <!-- ============================================
+         과정 상태 업데이트
+         ============================================ -->
+    <update id="updateCourseStatus">
+        UPDATE tb_course
+        SET status = #{status}, upd_dt = NOW()
+        WHERE course_id = #{courseId}
+    </update>
+
+</mapper>

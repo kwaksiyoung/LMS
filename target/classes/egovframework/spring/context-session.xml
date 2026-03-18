@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xsi:schemaLocation="
+           http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd">
+
+    <!-- ========================================
+         Redis 세션 클러스터링 설정 (개발 환경: 비활성화)
+         프로덕션 환경: Redis 서버 주소 설정 후 아래 설정 활성화
+         ======================================== -->
+
+    <!-- Redis 서버가 없는 개발 환경에서는 context-session.xml을 비활성화합니다.
+         Redis 설정이 필요한 경우 application.properties에서 redis.host를 수정하고
+         아래 코드를 활성화하세요.
+    -->
+
+    <!-- [주석 처리됨] Redis 연결 설정 (Lettuce)
+    <bean id="redisConnectionFactory" 
+          class="org.springframework.data.redis.connection.lettuce.LettuceConnectionFactory"
+          p:hostName="${redis.host:localhost}"
+          p:port="${redis.port:6379}"
+          p:database="${redis.database:0}">
+    </bean>
+
+    <bean id="redisTemplate" class="org.springframework.data.redis.core.RedisTemplate"
+          p:connectionFactory-ref="redisConnectionFactory">
+        <property name="keySerializer">
+            <bean class="org.springframework.data.redis.serializer.StringRedisSerializer"/>
+        </property>
+        <property name="valueSerializer">
+            <bean class="org.springframework.data.redis.serializer.GenericJackson2JsonRedisSerializer"/>
+        </property>
+        <property name="hashKeySerializer">
+            <bean class="org.springframework.data.redis.serializer.StringRedisSerializer"/>
+        </property>
+        <property name="hashValueSerializer">
+            <bean class="org.springframework.data.redis.serializer.GenericJackson2JsonRedisSerializer"/>
+        </property>
+    </bean>
+
+    <bean class="org.springframework.session.data.redis.config.annotation.web.http.RedisHttpSessionConfiguration">
+        <property name="maxInactiveIntervalInSeconds" value="1800"/>
+        <property name="redisNamespace" value="lms:session"/>
+    </bean>
+    -->
+
+</beans>

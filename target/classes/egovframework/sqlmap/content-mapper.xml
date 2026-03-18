@@ -1,0 +1,96 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="kr.co.lms.mapper.ContentMapper">
+    
+    <!-- ResultMap 정의 (DB 컬럼 ↔ ContentVO 매핑) -->
+    <resultMap id="contentMap" type="ContentVO">
+        <id column="content_id" property="contentId"/>
+        <result column="tenant_id" property="tenantId"/>
+        <result column="content_nm" property="contentTitle"/>
+        <result column="content_type" property="contentType"/>
+        <result column="content_url" property="contentUrl"/>
+        <result column="content_desc" property="contentDesc"/>
+        <result column="duration_minutes" property="durationMinutes"/>
+        <result column="use_yn" property="useYn"/>
+        <result column="reg_dt" property="regDt"/>
+        <result column="upd_dt" property="updDt"/>
+    </resultMap>
+    
+    <!-- 콘텐츠 조회 (ID로) -->
+    <select id="selectContent" parameterType="String" resultMap="contentMap">
+        SELECT content_id, tenant_id, content_nm, content_type, content_url, 
+               content_desc, duration_minutes, use_yn, reg_dt, upd_dt
+        FROM tb_content
+        WHERE content_id = #{contentId}
+    </select>
+    
+    <!-- 콘텐츠 목록 조회 (테넌트별) -->
+    <select id="selectContentList" parameterType="ContentVO" resultMap="contentMap">
+        SELECT content_id, tenant_id, content_nm, content_type, content_url, 
+               content_desc, duration_minutes, use_yn, reg_dt, upd_dt
+        FROM tb_content
+        WHERE 1=1
+        <if test="tenantId != null and tenantId != ''">
+            AND tenant_id = #{tenantId}
+        </if>
+        <if test="useYn != null and useYn != ''">
+            AND use_yn = #{useYn}
+        </if>
+        ORDER BY reg_dt DESC
+    </select>
+    
+    <!-- 콘텐츠 등록 -->
+    <insert id="insertContent" parameterType="ContentVO">
+        INSERT INTO tb_content (content_id, tenant_id, content_nm, content_type, 
+                                content_url, content_desc, duration_minutes, use_yn, reg_dt, upd_dt)
+        VALUES (#{contentId}, #{tenantId}, #{contentTitle}, #{contentType}, 
+                #{contentUrl}, #{contentDesc}, #{durationMinutes}, #{useYn}, NOW(), NOW())
+    </insert>
+    
+    <!-- 콘텐츠 수정 -->
+    <update id="updateContent" parameterType="ContentVO">
+        UPDATE tb_content
+        SET content_nm = #{contentTitle},
+            content_type = #{contentType},
+            content_url = #{contentUrl},
+            content_desc = #{contentDesc},
+            duration_minutes = #{durationMinutes},
+            use_yn = #{useYn},
+            upd_dt = NOW()
+        WHERE content_id = #{contentId}
+        AND tenant_id = #{tenantId}
+    </update>
+    
+    <!-- 콘텐츠 삭제 (논리적 삭제) -->
+    <delete id="deleteContent" parameterType="ContentVO">
+        UPDATE tb_content
+        SET use_yn = 'N',
+            upd_dt = NOW()
+        WHERE content_id = #{contentId}
+        AND tenant_id = #{tenantId}
+    </delete>
+    
+    <!-- 콘텐츠 수 조회 -->
+    <select id="selectContentCount" parameterType="ContentVO" resultType="int">
+        SELECT COUNT(*)
+        FROM tb_content
+        WHERE 1=1
+        <if test="tenantId != null and tenantId != ''">
+            AND tenant_id = #{tenantId}
+        </if>
+        <if test="useYn != null and useYn != ''">
+            AND use_yn = #{useYn}
+        </if>
+    </select>
+    
+    <!-- 강의별 콘텐츠 조회 (tb_lecture_content M:N 관계) -->
+    <select id="selectContentsByCourseId" parameterType="String" resultMap="contentMap">
+        SELECT DISTINCT c.content_id, c.tenant_id, c.content_nm, c.content_type, 
+               c.content_url, c.content_desc, c.duration_minutes, c.use_yn, c.reg_dt, c.upd_dt
+        FROM tb_content c
+        WHERE c.use_yn = 'Y'
+        ORDER BY c.reg_dt DESC
+    </select>
+    
+</mapper>
