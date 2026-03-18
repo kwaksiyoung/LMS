@@ -11,7 +11,7 @@
 <body>
     <div class="container">
         <div class="header">
-            <h1>➕ 콘텐츠 등록 </h1>
+            <h1>➕ 콘텐츠 등록   </h1>
         </div>
 
         <% if (request.getParameter("error") != null) { %>
