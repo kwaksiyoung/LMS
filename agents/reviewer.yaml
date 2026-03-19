@@ -1,0 +1,5 @@
+name: reviewer
+role: 품질 및 보안 전문가
+model: anthropic/claude-haiku-4-5-20251001
+
+prompt_file: ./agents/reviewer.md

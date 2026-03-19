@@ -1,0 +1,35 @@
+project:
+  name: egov-framework-4.2-project
+  description: 전자정부프레임워크 4.2 LMS 개발 
+
+models:
+  default: claude-3-opus
+  fallback: gpt-4o
+
+system_prompt: ./prompts/system.md
+
+context:
+  include:
+    - src/main/java/**
+    - src/main/resources/**
+    - src/main/webapp/**
+  exclude:
+    - target/**
+    - node_modules/**
+    - .git/**
+
+agents:
+  - analyzer
+  - architect
+  - backend
+  - db
+  - frontend
+  - reviewer
+
+workflow:
+  - analyzer
+  - architect
+  - backend
+  - db
+  - frontend
+  - reviewer
