@@ -250,3 +250,169 @@ public class LectureController {
     return "redirect:/lecture/list";
   }
 }
+
+  /**
+   * 차시 추가 (관리자만)
+   * JSP MVC 패턴: 폼 기반 제출
+   */
+  @PostMapping("/addContent")
+  public String addContent(
+      String lectureId,
+      @RequestParam(value = "contentIds", required = false) List<String> contentIds,
+      @RequestParam(required = false) String lectureContentTitle,
+      @RequestParam(required = false) String lectureContentDesc,
+      HttpSession session,
+      Model model) {
+    
+    logger.info("차시 추가: lectureId={}, contentIds={}", lectureId, contentIds);
+    
+    // 1️⃣ 권한 검증
+    if (!authorizationUtil.isAdmin(session)) {
+      logger.warn("권한 없음: 차시 추가 차단");
+      model.addAttribute("errorMessage", "관리자만 접근할 수 있습니다.");
+      return "redirect:/lecture/list";
+    }
+    
+    // 2️⃣ 테넌트 ID 추출
+    String tenantId = authorizationUtil.getTenantId(session);
+    
+    // 3️⃣ 검증
+    if (contentIds == null || contentIds.isEmpty()) {
+      logger.warn("차시 추가 실패: 콘텐츠 미선택");
+      model.addAttribute("errorMessage", "최소 1개의 콘텐츠를 선택하세요.");
+      return "redirect:/lecture/view?lectureId=" + lectureId;
+    }
+    
+    // 4️⃣ 비즈니스 로직
+    try {
+      int successCount = 0;
+      for (String contentId : contentIds) {
+        int result = lectureService.addContentToLecture(
+            lectureId,
+            contentId,
+            lectureContentTitle,
+            lectureContentDesc,
+            tenantId
+        );
+        if (result > 0) successCount++;
+      }
+      
+      if (successCount == 0) {
+        logger.warn("차시 추가 실패: DB 저장 실패");
+        model.addAttribute("errorMessage", "차시 추가에 실패했습니다.");
+        return "redirect:/lecture/view?lectureId=" + lectureId;
+      }
+      
+      logger.info("차시 추가 성공: lectureId={}, count={}", lectureId, successCount);
+      
+      // 5️⃣ 리다이렉트 응답
+      return "redirect:/lecture/view?lectureId=" + lectureId;
+      
+    } catch (Exception e) {
+      logger.error("차시 추가 중 오류: {}", e.getMessage(), e);
+      model.addAttribute("errorMessage", "차시 추가 중 오류가 발생했습니다.");
+      return "redirect:/lecture/view?lectureId=" + lectureId;
+    }
+  }
+
+  /**
+   * 차시 제거 (관리자만)
+   * JSP MVC 패턴: 폼 기반 제출
+   */
+  @PostMapping("/removeContent")
+  public String removeContent(
+      String lectureId,
+      String contentId,
+      HttpSession session,
+      Model model) {
+    
+    logger.info("차시 제거: lectureId={}, contentId={}", lectureId, contentId);
+    
+    // 1️⃣ 권한 검증
+    if (!authorizationUtil.isAdmin(session)) {
+      logger.warn("권한 없음: 차시 제거 차단");
+      model.addAttribute("errorMessage", "관리자만 접근할 수 있습니다.");
+      return "redirect:/lecture/list";
+    }
+    
+    // 2️⃣ 테넌트 ID 추출
+    String tenantId = authorizationUtil.getTenantId(session);
+    
+    // 3️⃣ 검증
+    if (contentId == null || contentId.trim().isEmpty()) {
+      logger.warn("차시 제거 실패: contentId 미지정");
+      model.addAttribute("errorMessage", "제거할 차시를 선택하세요.");
+      return "redirect:/lecture/view?lectureId=" + lectureId;
+    }
+    
+    // 4️⃣ 비즈니스 로직
+    try {
+      int result = lectureService.removeContentFromLecture(lectureId, contentId, tenantId);
+      
+      if (result == 0) {
+        logger.warn("차시 제거 실패: lectureId={}, contentId={}", lectureId, contentId);
+        model.addAttribute("errorMessage", "차시 제거에 실패했습니다.");
+        return "redirect:/lecture/view?lectureId=" + lectureId;
+      }
+      
+      logger.info("차시 제거 성공: lectureId={}, contentId={}", lectureId, contentId);
+      return "redirect:/lecture/view?lectureId=" + lectureId;
+      
+    } catch (Exception e) {
+      logger.error("차시 제거 중 오류: {}", e.getMessage(), e);
+      model.addAttribute("errorMessage", "차시 제거 중 오류가 발생했습니다.");
+      return "redirect:/lecture/view?lectureId=" + lectureId;
+    }
+  }
+
+  /**
+   * 차시 순서 변경 (관리자만)
+   * JSP MVC 패턴: 폼 기반 제출
+   */
+  @PostMapping("/reorderContent")
+  public String reorderContent(
+      String lectureId,
+      String contentId,
+      Integer newOrder,
+      HttpSession session,
+      Model model) {
+    
+    logger.info("차시 순서 변경: lectureId={}, contentId={}, newOrder={}", lectureId, contentId, newOrder);
+    
+    // 1️⃣ 권한 검증
+    if (!authorizationUtil.isAdmin(session)) {
+      logger.warn("권한 없음: 차시 순서 변경 차단");
+      model.addAttribute("errorMessage", "관리자만 접근할 수 있습니다.");
+      return "redirect:/lecture/list";
+    }
+    
+    // 2️⃣ 테넌트 ID 추출
+    String tenantId = authorizationUtil.getTenantId(session);
+    
+    // 3️⃣ 검증
+    if (contentId == null || contentId.trim().isEmpty() || newOrder == null || newOrder < 0) {
+      logger.warn("차시 순서 변경 실패: 파라미터 오류");
+      model.addAttribute("errorMessage", "순서 변경 파라미터가 올바르지 않습니다.");
+      return "redirect:/lecture/view?lectureId=" + lectureId;
+    }
+    
+    // 4️⃣ 비즈니스 로직
+    try {
+      int result = lectureService.reorderContent(lectureId, contentId, newOrder, tenantId);
+      
+      if (result == 0) {
+        logger.warn("차시 순서 변경 실패: lectureId={}, contentId={}", lectureId, contentId);
+        model.addAttribute("errorMessage", "차시 순서 변경에 실패했습니다.");
+        return "redirect:/lecture/view?lectureId=" + lectureId;
+      }
+      
+      logger.info("차시 순서 변경 성공: lectureId={}, contentId={}, newOrder={}", lectureId, contentId, newOrder);
+      return "redirect:/lecture/view?lectureId=" + lectureId;
+      
+    } catch (Exception e) {
+      logger.error("차시 순서 변경 중 오류: {}", e.getMessage(), e);
+      model.addAttribute("errorMessage", "차시 순서 변경 중 오류가 발생했습니다.");
+      return "redirect:/lecture/view?lectureId=" + lectureId;
+    }
+  }
+}

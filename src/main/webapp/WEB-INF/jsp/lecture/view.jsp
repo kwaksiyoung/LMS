@@ -154,9 +154,69 @@
                                     </div>
                                     <% if (isAdminUser) { %>
                                     <div class="content-actions">
-                                        <button class="btn btn-secondary btn-small" onclick="moveContentUp('${lecture.lectureId}', '${content.contentId}', ${status.index})">⬆️ 위로</button>
-                                        <button class="btn btn-secondary btn-small" onclick="moveContentDown('${lecture.lectureId}', '${content.contentId}', ${status.index})">⬇️ 아래로</button>
-                                        <button class="btn btn-danger btn-small" onclick="removeContent('${lecture.lectureId}', '${content.contentId}')">🗑️ 제거</button>
+                                        <form method="POST" action="<%= request.getContextPath() %>/lecture/reorderContent" style="display: inline;">
+                                            <input type="hidden" name="lectureId" value="${lecture.lectureId}">
+                                            <input type="hidden" name="contentId" value="${content.contentId}">
+                                            <input type="hidden" name="newOrder" value="<%= status.index - 1 %>">
+                                            <% if (status.index > 0) { %>
+                                            <button type="submit" class="btn btn-secondary btn-small">⬆️ 위로</button>
+                                            <% } %>
+                                        </form>
+                                        <form method="POST" action="<%= request.getContextPath() %>/lecture/reorderContent" style="display: inline;">
+                                            <input type="hidden" name="lectureId" value="${lecture.lectureId}">
+                                            <input type="hidden" name="contentId" value="${content.contentId}">
+                                            <input type="hidden" name="newOrder" value="<%= status.index + 1 %>">
+                                            <% if (status.index < lecture.contents.size() - 1) { %>
+                                            <button type="submit" class="btn btn-secondary btn-small">⬇️ 아래로</button>
+                                            <% } %>
+                                        </form>
+                                        <form method="POST" action="<%= request.getContextPath() %>/lecture/removeContent" style="display: inline;" onsubmit="return confirm('이 차시를 제거하시겠습니까?');">
+                                            <input type="hidden" name="lectureId" value="${lecture.lectureId}">
+                                            <input type="hidden" name="contentId" value="${content.contentId}">
+                                            <button type="submit" class="btn btn-danger btn-small">🗑️ 제거</button>
+                                        </form>
+                                        <form method="POST" action="<%= request.getContextPath() %>/lecture/reorderContent" style="display: inline;">
+                                            <input type="hidden" name="lectureId" value="${lecture.lectureId}">
+                                            <input type="hidden" name="contentId" value="${content.contentId}">
+                                            <input type="hidden" name="newOrder" value="<%= status.index - 1 %>">
+                                            <% if (status.index > 0) { %>
+                                            <button type="submit" class="btn btn-secondary btn-small">⬆️ 위로</button>
+                                            <% } %>
+                                        </form>
+                                        <form method="POST" action="<%= request.getContextPath() %>/lecture/reorderContent" style="display: inline;">
+                                            <input type="hidden" name="lectureId" value="${lecture.lectureId}">
+                                            <input type="hidden" name="contentId" value="${content.contentId}">
+                                            <input type="hidden" name="newOrder" value="<%= status.index + 1 %>">
+                                            <% if (status.index < lecture.contents.size() - 1) { %>
+                                            <button type="submit" class="btn btn-secondary btn-small">⬇️ 아래로</button>
+                                            <% } %>
+                                        </form>
+                                        <form method="POST" action="<%= request.getContextPath() %>/lecture/removeContent" style="display: inline;" onsubmit="return confirm('이 차시를 제거하시겠습니까?');">
+                                            <input type="hidden" name="lectureId" value="${lecture.lectureId}">
+                                            <input type="hidden" name="contentId" value="${content.contentId}">
+                                            <button type="submit" class="btn btn-danger btn-small">🗑️ 제거</button>
+                                        </form>
+                                        <form method="POST" action="<%= request.getContextPath() %>/lecture/reorderContent" style="display: inline;">
+                                            <input type="hidden" name="lectureId" value="${lecture.lectureId}">
+                                            <input type="hidden" name="contentId" value="${content.contentId}">
+                                            <input type="hidden" name="newOrder" value="<%= status.index - 1 %>">
+                                            <% if (status.index > 0) { %>
+                                            <button type="submit" class="btn btn-secondary btn-small">⬆️ 위로</button>
+                                            <% } %>
+                                        </form>
+                                        <form method="POST" action="<%= request.getContextPath() %>/lecture/reorderContent" style="display: inline;">
+                                            <input type="hidden" name="lectureId" value="${lecture.lectureId}">
+                                            <input type="hidden" name="contentId" value="${content.contentId}">
+                                            <input type="hidden" name="newOrder" value="<%= status.index + 1 %>">
+                                            <% if (status.index < lecture.contents.size() - 1) { %>
+                                            <button type="submit" class="btn btn-secondary btn-small">⬇️ 아래로</button>
+                                            <% } %>
+                                        </form>
+                                        <form method="POST" action="<%= request.getContextPath() %>/lecture/removeContent" style="display: inline;" onsubmit="return confirm('이 차시를 제거하시겠습니까?');">
+                                            <input type="hidden" name="lectureId" value="${lecture.lectureId}">
+                                            <input type="hidden" name="contentId" value="${content.contentId}">
+                                            <button type="submit" class="btn btn-danger btn-small">🗑️ 제거</button>
+                                        </form>
                                     </div>
                                     <% } %>
                                 </div>
@@ -177,62 +237,67 @@
                 <% if (isAdminUser) { %>
                 <div id="contentModal" class="modal" style="display: none;">
                     <div class="modal-content" style="max-width: 600px;">
-                        <div class="modal-header">
-                            <h2>차시 추가</h2>
-                            <button class="close-btn" onclick="closeContentModal()">&times;</button>
-                        </div>
-                        <div class="modal-body">
-                            <p style="color: #666; margin-bottom: 15px;">등록된 콘텐츠 중에서 선택하고 차시 제목을 입력하세요.</p>
-                            
-                            <!-- 콘텐츠 선택 섹션 (JSP MVC 패턴: 미리 로드된 콘텐츠 사용) -->
-                            <div style="margin-bottom: 20px;">
-                                <label style="display: block; margin-bottom: 10px; font-weight: bold;">콘텐츠 선택</label>
-                                <div id="contentList" style="max-height: 300px; overflow-y: auto; border: 1px solid #ddd; border-radius: 5px; padding: 10px;">
-                                    <% 
-                                        java.util.List<kr.co.lms.vo.ContentVO> availableContents = 
-                                            (java.util.List<kr.co.lms.vo.ContentVO>) request.getAttribute("availableContents");
-                                        
-                                        if (availableContents != null && availableContents.size() > 0) {
-                                            for (kr.co.lms.vo.ContentVO content : availableContents) {
-                                    %>
-                                        <label class="content-checkbox">
-                                            <input type="checkbox" value="<%= content.getContentId() %>" />
-                                            <strong><%= content.getContentTitle() != null ? content.getContentTitle() : "(제목 없음)" %></strong> <br/>
-                                            <small style="color: #666;"><%= content.getContentDesc() != null ? content.getContentDesc() : "" %></small>
-                                            <small style="color: #999; display: block; margin-top: 5px;">
-                                                유형: <%= content.getContentType() != null ? content.getContentType() : "-" %> | 시간: <%= content.getDurationMinutes() != null ? content.getDurationMinutes() : "-" %>분
-                                            </small>
-                                        </label>
-                                    <% 
+                        <form id="contentForm" method="POST" action="<%= request.getContextPath() %>/lecture/addContent" onsubmit="return validateForm()">
+                            <div class="modal-header">
+                                <h2>차시 추가</h2>
+                                <button type="button" class="close-btn" onclick="closeContentModal()">&times;</button>
+                            </div>
+                            <div class="modal-body">
+                                <p style="color: #666; margin-bottom: 15px;">등록된 콘텐츠 중에서 선택하고 차시 제목을 입력하세요.</p>
+                                
+                                <!-- 숨겨진 lectureId 필드 -->
+                                <input type="hidden" name="lectureId" value="${lecture.lectureId}">
+                                
+                                <!-- 콘텐츠 선택 섹션 (JSP MVC 패턴: 미리 로드된 콘텐츠 사용) -->
+                                <div style="margin-bottom: 20px;">
+                                    <label style="display: block; margin-bottom: 10px; font-weight: bold;">콘텐츠 선택</label>
+                                    <div id="contentList" style="max-height: 300px; overflow-y: auto; border: 1px solid #ddd; border-radius: 5px; padding: 10px;">
+                                        <% 
+                                            java.util.List<kr.co.lms.vo.ContentVO> availableContents = 
+                                                (java.util.List<kr.co.lms.vo.ContentVO>) request.getAttribute("availableContents");
+                                            
+                                            if (availableContents != null && availableContents.size() > 0) {
+                                                for (kr.co.lms.vo.ContentVO content : availableContents) {
+                                        %>
+                                            <label class="content-checkbox">
+                                                <input type="checkbox" name="contentIds" value="<%= content.getContentId() %>" />
+                                                <strong><%= content.getContentTitle() != null ? content.getContentTitle() : "(제목 없음)" %></strong> <br/>
+                                                <small style="color: #666;"><%= content.getContentDesc() != null ? content.getContentDesc() : "" %></small>
+                                                <small style="color: #999; display: block; margin-top: 5px;">
+                                                    유형: <%= content.getContentType() != null ? content.getContentType() : "-" %> | 시간: <%= content.getDurationMinutes() != null ? content.getDurationMinutes() : "-" %>분
+                                                </small>
+                                            </label>
+                                        <% 
+                                                }
+                                            } else {
+                                        %>
+                                            <p style="color: #999; padding: 20px; text-align: center;">사용 중인 콘텐츠가 없습니다.<br/><small>콘텐츠 관리에서 콘텐츠를 등록해주세요.</small></p>
+                                        <% 
                                             }
-                                        } else {
-                                    %>
-                                        <p style="color: #999; padding: 20px; text-align: center;">사용 중인 콘텐츠가 없습니다.<br/><small>콘텐츠 관리에서 콘텐츠를 등록해주세요.</small></p>
-                                    <% 
-                                        }
-                                    %>
+                                        %>
+                                    </div>
+                                </div>
+                                
+                                <!-- 차시 제목 입력 섹션 -->
+                                <div style="margin-bottom: 20px;">
+                                    <label for="lectureContentTitle" style="display: block; margin-bottom: 10px; font-weight: bold;">차시 제목 (선택사항)</label>
+                                    <input type="text" id="lectureContentTitle" name="lectureContentTitle" placeholder="예: 1. 환경 설정, 2. 기본 개념" 
+                                           style="width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 4px; box-sizing: border-box;">
+                                    <p style="color: #999; font-size: 12px; margin-top: 5px;">차시에 대한 구분 제목을 입력하면 학습 화면에서 표시됩니다.</p>
+                                </div>
+
+                                <!-- 차시 설명 입력 섹션 -->
+                                <div>
+                                    <label for="lectureContentDesc" style="display: block; margin-bottom: 10px; font-weight: bold;">차시 설명 (선택사항)</label>
+                                    <textarea id="lectureContentDesc" name="lectureContentDesc" placeholder="이 차시에 대한 간단한 설명을 입력하세요." 
+                                             style="width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 4px; box-sizing: border-box; height: 80px; resize: vertical;"></textarea>
                                 </div>
                             </div>
-                            
-                            <!-- 차시 제목 입력 섹션 -->
-                            <div style="margin-bottom: 20px;">
-                                <label for="lectureContentTitle" style="display: block; margin-bottom: 10px; font-weight: bold;">차시 제목 (선택사항)</label>
-                                <input type="text" id="lectureContentTitle" placeholder="예: 1. 환경 설정, 2. 기본 개념" 
-                                       style="width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 4px; box-sizing: border-box;">
-                                <p style="color: #999; font-size: 12px; margin-top: 5px;">차시에 대한 구분 제목을 입력하면 학습 화면에서 표시됩니다.</p>
+                            <div class="modal-footer">
+                                <button type="submit" class="btn btn-primary">선택한 차시 추가</button>
+                                <button type="button" class="btn btn-secondary" onclick="closeContentModal()">취소</button>
                             </div>
-
-                            <!-- 차시 설명 입력 섹션 -->
-                            <div>
-                                <label for="lectureContentDesc" style="display: block; margin-bottom: 10px; font-weight: bold;">차시 설명 (선택사항)</label>
-                                <textarea id="lectureContentDesc" placeholder="이 차시에 대한 간단한 설명을 입력하세요." 
-                                         style="width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 4px; box-sizing: border-box; height: 80px; resize: vertical;"></textarea>
-                            </div>
-                        </div>
-                        <div class="modal-footer">
-                            <button class="btn btn-primary" onclick="addSelectedContent('${lecture.lectureId}')">선택한 차시 추가</button>
-                            <button class="btn btn-secondary" onclick="closeContentModal()">취소</button>
-                        </div>
+                        </form>
                     </div>
                 </div>
                 <% } %>
@@ -283,108 +348,26 @@
             document.getElementById('contentModal').style.display = 'none';
         }
 
-        function addSelectedContent(lectureId) {
-            const checkboxes = document.querySelectorAll('#contentList input[type="checkbox"]:checked');
+
+        function closeContentModal() {
+            document.getElementById('contentModal').style.display = 'none';
+            // 폼 초기화
+            document.getElementById('contentForm').reset();
+        }
+
+        function validateForm() {
+            const checkboxes = document.querySelectorAll('input[name="contentIds"]:checked');
             if (checkboxes.length === 0) {
-                alert('추가할 차시를 선택해주세요.');
-                return;
+                alert('최소 1개의 콘텐츠를 선택하세요.');
+                return false;
             }
-
-            // 차시 제목과 설명 가져오기
-            const lectureContentTitle = document.getElementById('lectureContentTitle').value;
-            const lectureContentDesc = document.getElementById('lectureContentDesc').value;
-
-            const contentIds = Array.from(checkboxes).map(cb => cb.value);
-            
-            // 각 콘텐츠를 추가
-            let addedCount = 0;
-            contentIds.forEach((contentId, index) => {
-                fetch(contextPath + '/api/v1/lectures/' + lectureId + '/contents/' + contentId, {
-                    method: 'POST',
-                    credentials: 'include',  // JWT 토큰 포함
-                    headers: {
-                        'Content-Type': 'application/json'
-                    },
-                    body: JSON.stringify({ 
-                        contentOrder: index,
-                        lectureContentTitle: lectureContentTitle || null,
-                        lectureContentDesc: lectureContentDesc || null
-                    })
-                })
-                .then(response => {
-                    if (response.ok) {
-                        addedCount++;
-                        if (addedCount === contentIds.length) {
-                            alert('차시가 추가되었습니다. 페이지를 새로고침합니다.');
-                            location.reload();
-                        }
-                    }
-                })
-                .catch(error => console.error('추가 실패:', error));
-            });
+            return true;
         }
 
-        function removeContent(lectureId, contentId) {
-            if (!confirm('이 차시를 제거하시겠습니까?')) return;
-
-            fetch(contextPath + '/api/v1/lectures/' + lectureId + '/contents/' + contentId, {
-                method: 'DELETE',
-                credentials: 'include',  // JWT 토큰 포함
-                headers: {
-                    'Content-Type': 'application/json'
-                }
-            })
-            .then(response => {
-                if (response.ok) {
-                    alert('차시가 제거되었습니다.');
-                    location.reload();
-                } else {
-                    alert('차시 제거에 실패했습니다.');
-                }
-            })
-            .catch(error => {
-                console.error('제거 실패:', error);
-                alert('차시를 제거할 수 없습니다.');
-            });
-        }
-
-        function moveContentUp(lectureId, contentId, index) {
-            if (index === 0) {
-                alert('맨 위로 이동할 수 없습니다.');
-                return;
-            }
-            reorderContent(lectureId, contentId, index - 1);
-        }
-
-        function moveContentDown(lectureId, contentId, index) {
-            const totalItems = document.querySelectorAll('.lecture-content-item').length;
-            if (index === totalItems - 1) {
-                alert('맨 아래로 이동할 수 없습니다.');
-                return;
-            }
-            reorderContent(lectureId, contentId, index + 1);
-        }
-
-        function reorderContent(lectureId, contentId, newOrder) {
-            fetch(contextPath + '/api/v1/lectures/' + lectureId + '/contents/' + contentId + '/order', {
-                method: 'PUT',
-                credentials: 'include',  // JWT 토큰 포함
-                headers: {
-                    'Content-Type': 'application/json'
-                },
-                body: JSON.stringify({ contentOrder: newOrder })
-            })
-            .then(response => {
-                if (response.ok) {
-                    location.reload();
-                } else {
-                    alert('순서 변경에 실패했습니다.');
-                }
-            })
-            .catch(error => {
-                console.error('순서 변경 실패:', error);
-                alert('순서를 변경할 수 없습니다.');
-            });
+        function toggleContentFields(checkbox) {
+            // 현재는 모든 선택 콘텐츠에 동일한 제목/설명을 적용하므로
+            // 동적 필드 처리는 필요 없음
+            console.log('콘텐츠 선택:', checkbox.value, checkbox.checked);
         }
 
         // 모달 외부 클릭 시 닫기
