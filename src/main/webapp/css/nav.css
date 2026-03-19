@@ -1,0 +1,454 @@
+/* ========================================
+   네비게이션 스타일 (Navigation Styles)
+   - 상단 고정 헤더 (Top Header)
+   - 글로벌 네비게이션 바 (Global Navigation)
+   - 반응형 디자인 (768px, 600px, 320px)
+   ======================================== */
+
+/* ========================================
+   1. 상단 고정 헤더 (Top Header)
+   ======================================== */
+
+.top-header {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  background: white;
+  border-bottom: 1px solid #e0e0e0;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+  z-index: 1000;
+  height: 60px;
+}
+
+.top-header-container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 20px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  height: 100%;
+}
+
+/* 로고 스타일 */
+.logo {
+  font-size: 20px;
+  font-weight: 700;
+  color: #667eea;
+  text-decoration: none;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  transition: color 0.3s;
+  white-space: nowrap;
+}
+
+.logo:hover {
+  color: #5568d3;
+}
+
+/* 상단 메뉴 (우측 정렬) */
+.top-header-menu {
+  display: flex;
+  align-items: center;
+  gap: 25px;
+}
+
+.user-info {
+  display: flex;
+  align-items: center;
+  gap: 15px;
+}
+
+.user-name {
+  font-size: 13px;
+  color: #666;
+  font-weight: 500;
+}
+
+.menu-link {
+  font-size: 13px;
+  color: #333;
+  text-decoration: none;
+  padding: 6px 12px;
+  border-radius: 4px;
+  transition: all 0.3s;
+  border: 1px solid transparent;
+}
+
+.menu-link:hover {
+  background-color: #f0f0f0;
+  color: #667eea;
+}
+
+.logout-link {
+  background-color: #ff6b6b;
+  color: white !important;
+  border-color: #ff6b6b;
+}
+
+.logout-link:hover {
+  background-color: #e85555;
+  border-color: #e85555;
+}
+
+/* ========================================
+   2. 글로벌 네비게이션 바 (Global Navigation)
+   ======================================== */
+
+.nav-global {
+  position: fixed;
+  top: 60px;
+  left: 0;
+  right: 0;
+  background: white;
+  border-bottom: 2px solid #f0f0f0;
+  z-index: 999;
+}
+
+.nav-container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 20px;
+}
+
+.nav-menu {
+  list-style: none;
+  display: flex;
+  gap: 0;
+  padding: 0;
+  margin: 0;
+}
+
+/* 네비게이션 항목 */
+.nav-item {
+  position: relative;
+  flex: 1;
+}
+
+.nav-link {
+  display: block;
+  padding: 16px 20px;
+  color: #333;
+  text-decoration: none;
+  font-weight: 500;
+  font-size: 14px;
+  border-bottom: 3px solid transparent;
+  transition: all 0.3s;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.nav-link:hover {
+  color: #667eea;
+  background-color: #f8f9fa;
+  border-bottom-color: #667eea;
+}
+
+.nav-link.active {
+  color: #667eea;
+  border-bottom-color: #667eea;
+  background-color: #f8f9fa;
+}
+
+/* 서브메뉴 스타일 */
+.nav-submenu {
+  position: absolute;
+  top: 100%;
+  left: 0;
+  right: 0;
+  background: white;
+  border: 1px solid #e0e0e0;
+  border-radius: 0 0 8px 8px;
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  opacity: 0;
+  visibility: hidden;
+  transform: translateY(-10px);
+  transition: all 0.3s;
+  min-width: 150px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+.nav-item:hover .nav-submenu {
+  opacity: 1;
+  visibility: visible;
+  transform: translateY(0);
+}
+
+.nav-submenu li {
+  border-bottom: 1px solid #f0f0f0;
+}
+
+.nav-submenu li:last-child {
+  border-bottom: none;
+}
+
+.nav-submenu a {
+  display: block;
+  padding: 12px 20px;
+  color: #333;
+  text-decoration: none;
+  font-size: 13px;
+  transition: all 0.3s;
+}
+
+.nav-submenu a:hover {
+  background-color: #f8f9fa;
+  color: #667eea;
+  padding-left: 24px;
+}
+
+/* ========================================
+   3. 본문 콘텐츠 영역 조정
+   ======================================== */
+
+/* 헤더와 네비게이션을 고려한 body 패딩 */
+body {
+  padding-top: 0;
+  /* 고정 헤더(60px) + 글로벌 네비(60px) = 120px */
+}
+
+/* 콘텐츠 컨테이너 마진 조정 */
+main,
+.main-content {
+  margin-top: 120px;
+}
+
+/* 네비게이션이 없는 페이지 (로그인, 회원가입) */
+body.no-nav main,
+body.no-nav .main-content {
+  margin-top: 60px;
+}
+
+/* ========================================
+   4. 반응형 디자인 (768px 이하 - 타블릿)
+   ======================================== */
+
+@media (max-width: 768px) {
+  .top-header-container {
+    padding: 0 15px;
+  }
+
+  .logo {
+    font-size: 18px;
+    gap: 6px;
+  }
+
+  .top-header-menu {
+    gap: 15px;
+  }
+
+  .user-info {
+    gap: 10px;
+  }
+
+  .menu-link {
+    font-size: 12px;
+    padding: 5px 10px;
+  }
+
+  /* 네비게이션 메뉴 재정렬 */
+  .nav-menu {
+    flex-wrap: wrap;
+  }
+
+  .nav-item {
+    flex: 0 1 auto;
+    min-width: 140px;
+  }
+
+  .nav-link {
+    padding: 12px 15px;
+    font-size: 13px;
+  }
+
+  .nav-submenu {
+    min-width: 120px;
+  }
+
+  .nav-submenu a {
+    padding: 10px 15px;
+    font-size: 12px;
+  }
+
+  /* 콘텐츠 마진 조정 */
+  main,
+  .main-content {
+    margin-top: 110px; /* 헤더 + 네비 높이 조정 */
+  }
+
+  body.no-nav main,
+  body.no-nav .main-content {
+    margin-top: 60px;
+  }
+}
+
+/* ========================================
+   5. 반응형 디자인 (600px 이하 - 소형 모바일)
+   ======================================== */
+
+@media (max-width: 600px) {
+  .top-header {
+    height: 50px;
+  }
+
+  .top-header-container {
+    padding: 0 10px;
+    height: 50px;
+  }
+
+  .logo {
+    font-size: 16px;
+    gap: 4px;
+  }
+
+  .user-name {
+    display: none; /* 모바일에서 사용자명 숨김 */
+  }
+
+  .top-header-menu {
+    gap: 8px;
+  }
+
+  .user-info {
+    gap: 8px;
+  }
+
+  .menu-link {
+    font-size: 11px;
+    padding: 4px 8px;
+  }
+
+  /* 네비게이션 메뉴 - 한 줄로 표시 */
+  .nav-global {
+    top: 50px;
+  }
+
+  .nav-item {
+    flex: 1;
+    min-width: auto;
+  }
+
+  .nav-link {
+    padding: 10px 10px;
+    font-size: 12px;
+    text-align: center;
+  }
+
+  .nav-submenu {
+    min-width: 100px;
+    left: -20px;
+    right: auto;
+    width: 120px;
+  }
+
+  .nav-submenu a {
+    padding: 8px 12px;
+    font-size: 11px;
+  }
+
+  /* 콘텐츠 마진 조정 */
+  main,
+  .main-content {
+    margin-top: 100px; /* 헤더(50px) + 네비(50px) */
+  }
+
+  body.no-nav main,
+  body.no-nav .main-content {
+    margin-top: 50px;
+  }
+}
+
+/* ========================================
+   6. 반응형 디자인 (320px 이하 - 매우 작은 모바일)
+   ======================================== */
+
+@media (max-width: 320px) {
+  .top-header {
+    height: 45px;
+  }
+
+  .top-header-container {
+    height: 45px;
+    padding: 0 8px;
+  }
+
+  .logo {
+    font-size: 14px;
+    gap: 2px;
+  }
+
+  .top-header-menu {
+    gap: 4px;
+  }
+
+  .user-info {
+    gap: 4px;
+  }
+
+  .menu-link {
+    font-size: 10px;
+    padding: 3px 6px;
+  }
+
+  .nav-global {
+    top: 45px;
+  }
+
+  .nav-link {
+    padding: 8px 8px;
+    font-size: 11px;
+  }
+
+  .nav-submenu {
+    width: 100px;
+    left: -15px;
+  }
+
+  .nav-submenu a {
+    padding: 6px 10px;
+    font-size: 10px;
+  }
+
+  /* 콘텐츠 마진 조정 */
+  main,
+  .main-content {
+    margin-top: 90px; /* 헤더(45px) + 네비(45px) */
+  }
+
+  body.no-nav main,
+  body.no-nav .main-content {
+    margin-top: 45px;
+  }
+}
+
+/* ========================================
+   7. 유틸리티 클래스
+   ======================================== */
+
+/* 네비게이션 활성 상태 */
+.nav-link[data-active="true"],
+.nav-item:has(> .nav-link[data-active="true"]) .nav-link {
+  color: #667eea;
+  border-bottom-color: #667eea;
+  background-color: #f8f9fa;
+}
+
+/* 숨김 클래스 */
+.nav-hidden {
+  display: none !important;
+}
+
+/* 로그아웃 상태일 때 네비게이션 숨김 */
+body.logged-out .nav-global {
+  display: none;
+}
+
+body.logged-out main,
+body.logged-out .main-content {
+  margin-top: 60px;
+}

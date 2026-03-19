@@ -206,12 +206,14 @@ CREATE TABLE IF NOT EXISTS tb_lecture (
     lecture_nm VARCHAR(200) NOT NULL COMMENT '강의명 (단원명)',
     lecture_desc VARCHAR(1000) COMMENT '강의 설명',
     duration_minutes INT COMMENT '강의 총 시간 (분)',
+    lecture_type VARCHAR(20) DEFAULT 'REQUIRED' COMMENT '차시 유형 (REQUIRED: 필수, OPTIONAL: 선택)',
     use_yn CHAR(1) DEFAULT 'Y' COMMENT '사용여부',
     reg_dt DATETIME DEFAULT CURRENT_TIMESTAMP COMMENT '등록일',
     upd_dt DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '수정일',
     PRIMARY KEY (lecture_id, tenant_id),
     CONSTRAINT fk_lecture_tenant FOREIGN KEY (tenant_id) REFERENCES tb_tenant(tenant_id) ON DELETE CASCADE,
-    INDEX idx_tenant (tenant_id)
+    INDEX idx_tenant (tenant_id),
+    INDEX idx_lecture_type (lecture_type)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='강의(단원) 정보 (과정과 독립적으로 관리)';
 
 -- ============================================================================

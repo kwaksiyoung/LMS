@@ -34,20 +34,17 @@ public class ContentApiController {
   private final ContentService contentService;
 
   /**
-   * 콘텐츠 목록 조회 (관리자)
-   * GET /api/v1/contents?courseId=COURSE001
+   * 콘텐츠 목록 조회 (전체 공개, 사용 여부 Y인 콘텐츠만)
+   * GET /api/v1/contents
+   * GET /api/v1/contents?active=Y  (사용 여부 Y인 콘텐츠만)
    */
   @GetMapping
   public ResponseEntity<ApiResponse<List<ContentVO>>> getContentList(
       @RequestParam(required = false) String courseId,
+      @RequestParam(required = false) String active,
       HttpServletRequest request) {
 
-    if (!ApiAuthUtil.isAdmin(request)) {
-      return ResponseEntity.status(HttpStatus.FORBIDDEN)
-          .body(ApiResponse.error("관리자만 접근할 수 있습니다."));
-    }
-
-    logger.info("콘텐츠 목록 조회 API: courseId={}", courseId);
+    logger.info("콘텐츠 목록 조회 API: courseId={}, active={}", courseId, active);
 
     List<ContentVO> contents;
     if (courseId != null && !courseId.trim().isEmpty()) {
@@ -55,6 +52,12 @@ public class ContentApiController {
     } else {
       ContentVO searchVO = new ContentVO();
       searchVO.setTenantId(ApiAuthUtil.getCurrentTenantId(request));
+      
+      // active=Y인 경우 사용 여부가 Y인 콘텐츠만 반환
+      if ("Y".equalsIgnoreCase(active)) {
+        searchVO.setUseYn("Y");
+      }
+      
       contents = contentService.selectContentList(searchVO);
     }
 

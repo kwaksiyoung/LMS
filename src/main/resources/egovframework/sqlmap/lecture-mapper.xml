@@ -1,0 +1,176 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+    "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="kr.co.lms.mapper.LectureMapper">
+
+    <!-- ============================================
+          강의 VO 매핑
+          ============================================ -->
+    <resultMap id="lectureMap" type="LectureVO">
+        <id column="lecture_id" property="lectureId"/>
+        <result column="tenant_id" property="tenantId"/>
+        <result column="lecture_nm" property="lectureNm"/>
+        <result column="lecture_desc" property="lectureDesc"/>
+        <result column="duration_minutes" property="durationMinutes"/>
+        <result column="lecture_type" property="lectureType"/>
+        <result column="use_yn" property="useYn"/>
+        <result column="reg_dt" property="regDt"/>
+        <result column="upd_dt" property="updDt"/>
+    </resultMap>
+
+    <!-- ============================================
+          강의 + 콘텐츠 결합 매핑 (최적화 쿼리용)
+          ============================================ -->
+    <resultMap id="lectureWithContentsMap" type="LectureVO">
+        <id column="lecture_id" property="lectureId"/>
+        <result column="tenant_id" property="tenantId"/>
+        <result column="lecture_nm" property="lectureNm"/>
+        <result column="lecture_desc" property="lectureDesc"/>
+        <result column="duration_minutes" property="durationMinutes"/>
+        <result column="lecture_type" property="lectureType"/>
+        <result column="use_yn" property="useYn"/>
+        <result column="reg_dt" property="regDt"/>
+        <result column="upd_dt" property="updDt"/>
+        <collection property="contents" ofType="ContentVO">
+            <id column="content_id" property="contentId"/>
+            <result column="content_title" property="contentTitle"/>
+            <result column="content_type" property="contentType"/>
+            <result column="content_desc" property="contentDesc"/>
+            <result column="content_duration_minutes" property="durationMinutes"/>
+            <result column="content_reg_dt" property="regDt"/>
+        </collection>
+    </resultMap>
+
+    <!-- ============================================
+         강의 조회 (ID로)
+         ============================================ -->
+    <select id="selectLecture" parameterType="string" resultMap="lectureMap">
+        SELECT lecture_id, tenant_id, lecture_nm, lecture_desc, duration_minutes, 
+               lecture_type, use_yn, reg_dt, upd_dt
+        FROM tb_lecture
+        WHERE lecture_id = #{lectureId}
+    </select>
+
+    <!-- ============================================
+          강의 목록 조회
+          ============================================ -->
+    <select id="selectLectureList" parameterType="LectureVO" resultMap="lectureMap">
+        SELECT lecture_id, tenant_id, lecture_nm, lecture_desc, duration_minutes, 
+               lecture_type, use_yn, reg_dt, upd_dt
+        FROM tb_lecture
+        WHERE 1=1
+        <if test="useYn != null and useYn != ''">
+            AND use_yn = #{useYn}
+        </if>
+        <if test="lectureType != null and lectureType != ''">
+            AND lecture_type = #{lectureType}
+        </if>
+        ORDER BY reg_dt DESC
+    </select>
+
+    <!-- ============================================
+          강의 등록
+          ============================================ -->
+    <insert id="insertLecture" parameterType="LectureVO">
+        INSERT INTO tb_lecture (lecture_id, tenant_id, lecture_nm, lecture_desc, 
+                               duration_minutes, lecture_type, use_yn, reg_dt, upd_dt)
+        VALUES (#{lectureId}, #{tenantId}, #{lectureNm}, #{lectureDesc}, 
+                #{durationMinutes}, #{lectureType, jdbcType=VARCHAR, typeHandler=org.apache.ibatis.type.StringTypeHandler}, 'Y', NOW(), NOW())
+    </insert>
+
+    <!-- ============================================
+          강의 수정
+          ============================================ -->
+    <update id="updateLecture" parameterType="LectureVO">
+        UPDATE tb_lecture
+        SET lecture_nm = #{lectureNm},
+            lecture_desc = #{lectureDesc},
+            duration_minutes = #{durationMinutes},
+            lecture_type = #{lectureType},
+            upd_dt = NOW()
+        WHERE lecture_id = #{lectureId}
+    </update>
+
+    <!-- ============================================
+         강의 삭제 (논리적 삭제)
+         ============================================ -->
+    <delete id="deleteLecture" parameterType="string">
+        UPDATE tb_lecture
+        SET use_yn = 'N', upd_dt = NOW()
+        WHERE lecture_id = #{lectureId}
+    </delete>
+
+    <!-- ============================================
+         강의 수 조회
+         ============================================ -->
+    <select id="selectLectureCount" parameterType="LectureVO" resultType="int">
+        SELECT COUNT(*)
+        FROM tb_lecture
+        WHERE 1=1
+        <if test="useYn != null and useYn != ''">
+            AND use_yn = #{useYn}
+        </if>
+    </select>
+
+    <!-- ============================================
+          최적화된 강의 + 콘텐츠 조회 (LEFT JOIN - N+1 해결)
+          ============================================ -->
+    <select id="selectLectureWithContentsOptimized" parameterType="map" resultMap="lectureWithContentsMap">
+        SELECT 
+            l.lecture_id, l.tenant_id, l.lecture_nm, l.lecture_desc, 
+            l.duration_minutes, l.lecture_type, l.use_yn, l.reg_dt, l.upd_dt,
+            c.content_id, c.content_nm as content_title, c.content_type, 
+            c.content_desc, c.duration_minutes as content_duration_minutes, 
+            c.reg_dt as content_reg_dt
+        FROM tb_lecture l
+        LEFT JOIN tb_lecture_content lc ON l.lecture_id = lc.lecture_id AND l.tenant_id = lc.tenant_id
+        LEFT JOIN tb_content c ON lc.content_id = c.content_id AND lc.tenant_id = c.tenant_id
+        WHERE l.lecture_id = #{lectureId}
+        ORDER BY lc.content_order ASC, c.reg_dt DESC
+    </select>
+
+    <!-- ============================================
+          검색/필터링/페이징을 포함한 강의 목록 조회
+          ============================================ -->
+    <select id="selectLectureListWithSearch" parameterType="LectureVO" resultMap="lectureMap">
+        SELECT lecture_id, tenant_id, lecture_nm, lecture_desc, duration_minutes, 
+               lecture_type, use_yn, reg_dt, upd_dt
+        FROM tb_lecture
+        WHERE 1=1
+        <if test="useYn != null and useYn != ''">
+            AND use_yn = #{useYn}
+        </if>
+        <if test="lectureType != null and lectureType != ''">
+            AND lecture_type = #{lectureType}
+        </if>
+        <if test="searchKeyword != null and searchKeyword != ''">
+            AND (lecture_nm LIKE CONCAT('%', #{searchKeyword}, '%') 
+                 OR lecture_desc LIKE CONCAT('%', #{searchKeyword}, '%'))
+        </if>
+        ORDER BY reg_dt DESC
+        <if test="startRow != null and pageSize != null">
+            LIMIT #{startRow}, #{pageSize}
+        </if>
+    </select>
+
+    <!-- ============================================
+          검색/필터링된 강의 수 조회 (페이징용)
+          ============================================ -->
+    <select id="selectLectureListWithSearchCount" parameterType="LectureVO" resultType="int">
+        SELECT COUNT(*)
+        FROM tb_lecture
+        WHERE 1=1
+        <if test="useYn != null and useYn != ''">
+            AND use_yn = #{useYn}
+        </if>
+        <if test="lectureType != null and lectureType != ''">
+            AND lecture_type = #{lectureType}
+        </if>
+        <if test="searchKeyword != null and searchKeyword != ''">
+            AND (lecture_nm LIKE CONCAT('%', #{searchKeyword}, '%') 
+                 OR lecture_desc LIKE CONCAT('%', #{searchKeyword}, '%'))
+        </if>
+    </select>
+
+</mapper>

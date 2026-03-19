@@ -13,111 +13,9 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>LMS - Learning Management System</title>
+    <link rel="stylesheet" href="<%= request.getContextPath() %>/css/common.css">
+    <link rel="stylesheet" href="<%= request.getContextPath() %>/css/nav.css">
     <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-        body {
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
-            background: #f5f5f5;
-            min-height: 100vh;
-        }
-        .navbar {
-            background: white;
-            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
-            position: sticky;
-            top: 0;
-            z-index: 1000;
-        }
-        .navbar-container {
-            max-width: 1400px;
-            margin: 0 auto;
-            padding: 0 20px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            height: 70px;
-        }
-        .navbar-logo {
-            font-size: 24px;
-            font-weight: bold;
-            color: #667eea;
-            text-decoration: none;
-            display: flex;
-            align-items: center;
-            gap: 10px;
-        }
-        .navbar-logo:hover {
-            color: #5568d3;
-        }
-        .navbar-menu {
-            display: flex;
-            gap: 40px;
-            align-items: center;
-            flex: 1;
-            margin-left: 60px;
-        }
-        .navbar-menu a {
-            color: #333;
-            text-decoration: none;
-            font-weight: 500;
-            transition: color 0.3s;
-            padding: 8px 12px;
-            border-radius: 4px;
-        }
-        .navbar-menu a:hover {
-            background: #f0f0f0;
-            color: #667eea;
-        }
-        .navbar-admin {
-            display: flex;
-            gap: 20px;
-            margin-left: auto;
-        }
-        .navbar-user {
-            display: flex;
-            gap: 15px;
-            align-items: center;
-            margin-left: auto;
-        }
-        .navbar-user-name {
-            color: #666;
-            font-size: 14px;
-            font-weight: 500;
-        }
-        .btn-logout {
-            display: inline-block;
-            padding: 8px 16px;
-            background: #ff6b6b;
-            color: white;
-            text-decoration: none;
-            border-radius: 4px;
-            font-size: 14px;
-            font-weight: 500;
-            transition: all 0.3s;
-        }
-        .btn-logout:hover {
-            background: #ff5252;
-        }
-        .btn-admin {
-            display: inline-block;
-            padding: 10px 20px;
-            background: #667eea;
-            color: white;
-            text-decoration: none;
-            border-radius: 4px;
-            font-size: 14px;
-            font-weight: 500;
-            transition: all 0.3s;
-            margin-right: 10px;
-        }
-        .btn-admin:hover {
-            background: #5568d3;
-            transform: translateY(-2px);
-            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
-        }
         .main-container {
             max-width: 1400px;
             margin: 40px auto;
@@ -251,37 +149,18 @@
     </style>
 </head>
 <body>
-    <nav class="navbar">
-        <div class="navbar-container">
-            <a href="<%= request.getContextPath() %>/" class="navbar-logo">
-                📚 LMS(Tester1@#****)
-            </a>
+    <!-- 공통 헤더 포함 -->
+    <jsp:include page="/WEB-INF/jsp/layout/header.jsp" />
+    
+    <!-- 공통 네비게이션 포함 (로그인 시에만 표시) -->
+    <% if (isLoggedIn) { %>
+    <jsp:include page="/WEB-INF/jsp/layout/navigation.jsp" />
+    <% } else { %>
+    <!-- 비로그인 상태 body 태그에 클래스 추가 -->
+    <script>document.body.classList.add('logged-out');</script>
+    <% } %>
 
-            <% if (isLoggedIn) { %>
-            <div class="navbar-menu">
-                <a href="<%= request.getContextPath() %>/user/myinfo">내 정보</a>
-            </div>
-
-            <% if (isAdminUser) { %>
-            <div class="navbar-admin">
-                <a href="<%= request.getContextPath() %>/content/list" class="btn-admin">📋 콘텐츠 목록</a>
-                <a href="<%= request.getContextPath() %>/content/create" class="btn-admin">➕ 새 콘텐츠</a>
-            </div>
-            <% } %>
-
-            <div class="navbar-user">
-                <span class="navbar-user-name"><%= userName != null ? userName : userId %></span>
-                <a href="<%= request.getContextPath() %>/user/logout" class="btn-logout">로그아웃</a>
-            </div>
-
-            <% } else { %>
-            <div class="navbar-user" style="margin-left: auto;">
-                <a href="<%= request.getContextPath() %>/login" class="btn btn-primary">로그인</a>
-            </div>
-            <% } %>
-        </div>
-    </nav>
-
+    <main class="main-content">
     <div class="main-container">
         <% if (isLoggedIn) { %>
         <div class="welcome-section">
@@ -329,7 +208,7 @@
             <h2>Learning Management System</h2>
             <p>로그인하여 학습을 시작하세요.</p>
             <div class="login-buttons">
-                <a href="<%= request.getContextPath() %>/login" class="btn btn-primary">로그인</a>
+                <a href="<%= request.getContextPath() %>/auth/login" class="btn btn-primary">로그인</a>
                 <a href="<%= request.getContextPath() %>/user/register" class="btn btn-secondary">회원가입</a>
             </div>
         </div>
@@ -347,5 +226,6 @@
         </div>
         <% } %>
     </div>
+    </main>
 </body>
 </html>

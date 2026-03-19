@@ -17,6 +17,8 @@ public class LectureContentVO implements Serializable {
     private String contentId;
     private String tenantId;
     private Integer contentOrder;
+    private String lectureContentTitle;      // 차시 제목 (예: 1. 환경 설정)
+    private String lectureContentDesc;       // 차시 설명
     private LocalDateTime regDt;
     private LocalDateTime updDt;
 
@@ -75,6 +77,22 @@ public class LectureContentVO implements Serializable {
         this.contentOrder = contentOrder;
     }
 
+    public String getLectureContentTitle() {
+        return lectureContentTitle;
+    }
+
+    public void setLectureContentTitle(String lectureContentTitle) {
+        this.lectureContentTitle = lectureContentTitle;
+    }
+
+    public String getLectureContentDesc() {
+        return lectureContentDesc;
+    }
+
+    public void setLectureContentDesc(String lectureContentDesc) {
+        this.lectureContentDesc = lectureContentDesc;
+    }
+
     public LocalDateTime getRegDt() {
         return regDt;
     }
@@ -98,6 +116,8 @@ public class LectureContentVO implements Serializable {
                 ", contentId='" + contentId + '\'' +
                 ", tenantId='" + tenantId + '\'' +
                 ", contentOrder=" + contentOrder +
+                ", lectureContentTitle='" + lectureContentTitle + '\'' +
+                ", lectureContentDesc='" + lectureContentDesc + '\'' +
                 '}';
     }
 }

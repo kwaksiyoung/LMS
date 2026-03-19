@@ -7,8 +7,11 @@
     <title>LMS - 로그인</title>
     <link rel="stylesheet" href="<%= request.getContextPath() %>/css/common.css">
     <link rel="stylesheet" href="<%= request.getContextPath() %>/css/login.css">
+    <link rel="stylesheet" href="<%= request.getContextPath() %>/css/nav.css">
 </head>
-<body>
+<body class="logged-out">
+    <!-- 공통 헤더 포함 (비로그인 상태) -->
+    <jsp:include page="/WEB-INF/jsp/layout/header.jsp" />
     <div class="login-container">
         <h1>LMS 로그인</h1>
 
@@ -18,7 +21,7 @@
         </div>
         <% } %>
 
-        <form method="post" action="<%= request.getContextPath() %>/user/login/process">
+        <form method="post" action="<%= request.getContextPath() %>/auth/login">
             <div class="form-group">
                 <label for="tenantId">테넌트</label>
                 <select id="tenantId" name="tenantId" required>

@@ -27,11 +27,11 @@ public class HomeController {
     
     /**
      * 로그인 페이지 리다이렉트
-     * GET /login → /user/login (UserController로 리다이렉트)
+     * GET /login → /auth/login (AuthController로 리다이렉트)
      */
     @GetMapping("/login")
     public String loginRedirect() {
         log.debug("로그인 페이지 리다이렉트");
-        return "redirect:/user/login";
+        return "redirect:/auth/login";
     }
 }

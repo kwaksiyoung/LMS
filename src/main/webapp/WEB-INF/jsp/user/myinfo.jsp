@@ -8,16 +8,19 @@
     <title>LMS - 내 정보</title>
     <link rel="stylesheet" href="<%= request.getContextPath() %>/css/common.css">
     <link rel="stylesheet" href="<%= request.getContextPath() %>/css/myinfo.css">
+    <link rel="stylesheet" href="<%= request.getContextPath() %>/css/nav.css">
 </head>
 <body>
-    <div class="container">
-        <div class="header">
-            <div>
+    <!-- 공통 헤더 포함 -->
+    <jsp:include page="/WEB-INF/jsp/layout/header.jsp" />
+    
+    <!-- 공통 네비게이션 포함 -->
+    <jsp:include page="/WEB-INF/jsp/layout/navigation.jsp" />
+
+    <main class="main-content">
+        <div class="container">
+            <div class="page-header">
                 <h1>👤 내 정보</h1>
-            </div>
-            <div class="nav-links">
-                <a href="<%= request.getContextPath() %>/" class="btn btn-secondary">홈</a>
-                <a href="<%= request.getContextPath() %>/user/logout" class="btn btn-danger">로그아웃</a>
             </div>
         </div>
 
@@ -80,6 +83,7 @@
                 <% } %>
             </div>
         </div>
-    </div>
+        </div>
+    </main>
 </body>
 </html>

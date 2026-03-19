@@ -7,12 +7,20 @@
     <title>LMS - 콘텐츠 수정</title>
     <link rel="stylesheet" href="<%= request.getContextPath() %>/css/common.css">
     <link rel="stylesheet" href="<%= request.getContextPath() %>/css/content.css">
+    <link rel="stylesheet" href="<%= request.getContextPath() %>/css/nav.css">
 </head>
 <body>
-    <div class="container">
-        <div class="header">
-            <h1>✏️ 콘텐츠 수정</h1>
-        </div>
+    <!-- 공통 헤더 포함 -->
+    <jsp:include page="/WEB-INF/jsp/layout/header.jsp" />
+    
+    <!-- 공통 네비게이션 포함 -->
+    <jsp:include page="/WEB-INF/jsp/layout/navigation.jsp" />
+
+    <main class="main-content">
+        <div class="container">
+            <div class="page-header">
+                <h1>✏️ 콘텐츠 수정</h1>
+            </div>
 
         <% if (request.getParameter("error") != null) { %>
         <div class="alert alert-error">
@@ -81,6 +89,7 @@
                 <a href="<%= request.getContextPath() %>/content/list" class="btn btn-secondary">취소</a>
             </div>
         </form>
-    </div>
+        </div>
+    </main>
 </body>
 </html>

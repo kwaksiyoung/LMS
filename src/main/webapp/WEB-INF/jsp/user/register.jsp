@@ -8,8 +8,11 @@
     <title>회원가입 - LMS</title>
     <link rel="stylesheet" href="<%= request.getContextPath() %>/css/common.css">
     <link rel="stylesheet" href="<%= request.getContextPath() %>/css/register.css">
+    <link rel="stylesheet" href="<%= request.getContextPath() %>/css/nav.css">
 </head>
-<body>
+<body class="logged-out">
+    <!-- 공통 헤더 포함 (비로그인 상태) -->
+    <jsp:include page="/WEB-INF/jsp/layout/header.jsp" />
     <div class="register-container">
         <div class="register-header">
             <h1>회원가입</h1>
@@ -172,7 +175,7 @@
 
         <!-- 로그인 링크 -->
         <div class="login-link">
-            이미 회원이신가요? <a href="/LMS/login">로그인</a>
+            이미 회원이신가요? <a href="<%= request.getContextPath() %>/auth/login">로그인</a>
         </div>
     </div>
 
@@ -363,7 +366,7 @@
                     
                     // 2초 후 로그인 페이지로 이동
                     setTimeout(() => {
-                        window.location.href = contextPath + '/login';
+                        window.location.href = contextPath + '/auth/login';
                     }, 2000);
                 } else {
                     showAlert(result.message || '회원가입에 실패했습니다.', 'error');
