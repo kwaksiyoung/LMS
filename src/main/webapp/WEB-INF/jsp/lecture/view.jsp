@@ -256,7 +256,8 @@
 
         function openContentModal(lectureId) {
             // JSP MVC 패턴: 이미 로드된 콘텐츠 목록 사용
-            // (availableContents는 JSP에서 model.addAttribute()로 전달됨)
+            // (availableContents는 LectureController.view()에서 model.addAttribute()로 전달됨)
+            // JSP에서 렌더링된 HTML은 변경하지 않음 (그대로 유지)
             
             const contentList = document.getElementById('contentList');
             if (!contentList) {
@@ -265,10 +266,8 @@
                 return;
             }
             
-            // 모달 열기 전 콘텐츠 목록 초기화
-            contentList.innerHTML = '';
-            
             console.log('콘텐츠 모달 열기: JSP MVC 패턴 (미리 로드된 콘텐츠 사용)');
+            console.log('contentList HTML:', contentList.innerHTML.length + '자');
             
             // 모달 열기
             const contentModal = document.getElementById('contentModal');

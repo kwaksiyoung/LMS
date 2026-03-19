@@ -100,9 +100,13 @@ public class LectureController {
     // JSP MVC 패턴: 모달용 콘텐츠 목록 미리 로드 (useYn='Y'인 콘텐츠만)
     ContentVO searchVO = new ContentVO();
     searchVO.setUseYn("Y");
+    // tenantId 설정 (session에서 조회)
+    String tenantId = authorizationUtil.getTenantId(session);
+    searchVO.setTenantId(tenantId);
+    
     List<ContentVO> availableContents = contentService.selectContentList(searchVO);
     
-    logger.info("강의 상세 조회: 사용 가능한 콘텐츠 {} 개", availableContents != null ? availableContents.size() : 0);
+    logger.info("강의 상세 조회: tenantId={}, 사용 가능한 콘텐츠 {} 개", tenantId, availableContents != null ? availableContents.size() : 0);
     
     model.addAttribute("lecture", lecture);
     model.addAttribute("availableContents", availableContents);  // 모달용 콘텐츠 목록
