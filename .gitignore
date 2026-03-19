@@ -1,0 +1,30 @@
+# application.properties 파일 (보안 정보)
+# 추후에 더 추가할 예정
+application.properties
+
+# IDE
+.idea/
+.vscode/
+*.swp
+*.swo
+*~
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Build
+target/
+build/
+*.class
+*.jar
+*.war
+
+# Log
+*.log
+build.log
+
+# Gradle & Maven
+.gradle/
+.m2/
+gradle-wrapper.jar
