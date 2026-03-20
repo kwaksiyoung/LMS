@@ -293,11 +293,13 @@
         }
 
         function validateForm() {
-            const checkboxes = document.querySelectorAll('input[name="contentIds"]:checked');
-            if (checkboxes.length === 0) {
+            const selectedRadio = document.querySelector('input[name="contentIds"]:checked');
+            console.log('선택된 라디오:', selectedRadio); // 디버깅 로그
+            if (!selectedRadio) {
                 alert('최소 1개의 콘텐츠를 선택하세요.');
                 return false;
             }
+            console.log('선택된 contentId:', selectedRadio.value); // 디버깅 로그
             return true;
         }
 

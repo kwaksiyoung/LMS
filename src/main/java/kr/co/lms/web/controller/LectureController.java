@@ -13,6 +13,7 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpSession;
+import java.util.*;
 import java.util.List;
 import java.util.UUID;
 
@@ -257,13 +258,14 @@ public class LectureController {
   @PostMapping("/addContent")
   public String addContent(
       String lectureId,
-      @RequestParam(value = "contentIds", required = false) List<String> contentIds,
+      @RequestParam(value = "contentIds", required = false) String contentIds,
       @RequestParam(required = false) String lectureContentTitle,
       @RequestParam(required = false) String lectureContentDesc,
       HttpSession session,
       Model model) {
     
-    logger.info("차시 추가: lectureId={}, contentIds={}", lectureId, contentIds);
+    logger.info("차시 추가 요청: lectureId={}, contentIds={}, title={}, desc={}", 
+        lectureId, contentIds, lectureContentTitle, lectureContentDesc);
     
     // 1️⃣ 권한 검증
     if (!authorizationUtil.isAdmin(session)) {
@@ -274,42 +276,55 @@ public class LectureController {
     
     // 2️⃣ 테넌트 ID 추출
     String tenantId = authorizationUtil.getTenantId(session);
+    logger.info("테넌트 ID: {}", tenantId);
     
-    // 3️⃣ 검증
-    if (contentIds == null || contentIds.isEmpty()) {
+    // 3️⃣ contentIds를 List로 변환 (라디오 버튼은 단일 값만 전송)
+    List<String> contentIdList = new ArrayList<>();
+    if (contentIds != null && !contentIds.trim().isEmpty()) {
+      contentIdList.add(contentIds.trim()); // 라디오 버튼 선택값 하나를 리스트에 추가
+    }
+    
+    // 4️⃣ 검증
+    if (contentIdList.isEmpty()) {
       logger.warn("차시 추가 실패: 콘텐츠 미선택");
       model.addAttribute("errorMessage", "최소 1개의 콘텐츠를 선택하세요.");
       return "redirect:/lecture/view?lectureId=" + lectureId;
     }
+    logger.info("검증 통과: {} 개 콘텐츠 선택됨", contentIdList.size());
     
      // 4️⃣ 비즈니스 로직
-     try {
-       // 현재 최대 contentOrder 조회
-       LectureVO lecture = lectureService.selectLectureWithContentsOptimized(lectureId);
-       int maxOrder = 0;
-       if (lecture != null && lecture.getContents() != null) {
-         for (ContentVO content : lecture.getContents()) {
-           if (content.getContentOrder() != null && content.getContentOrder() >= maxOrder) {
-             maxOrder = content.getContentOrder() + 1;
-           }
-         }
-       }
-       
-       int successCount = 0;
-       for (String contentId : contentIds) {
-         int result = lectureService.addContentToLecture(
-             lectureId,
-             contentId,
-             tenantId,
-             maxOrder,  // 최대 order + 1로 설정 (새 차시를 맨 뒤에 추가)
-             lectureContentTitle,
-             lectureContentDesc
-         );
-         if (result > 0) {
-           successCount++;
-           maxOrder++;  // 다음 차시를 위해 order 증가
-         }
-       }
+      try {
+        // 현재 최대 contentOrder 조회
+        LectureVO lecture = lectureService.selectLectureWithContentsOptimized(lectureId);
+        int maxOrder = 0;
+        if (lecture != null && lecture.getContents() != null) {
+          for (ContentVO content : lecture.getContents()) {
+            if (content.getContentOrder() != null && content.getContentOrder() >= maxOrder) {
+              maxOrder = content.getContentOrder() + 1;
+            }
+          }
+        }
+        logger.info("현재 최대 contentOrder: {}", maxOrder);
+        
+        int successCount = 0;
+        for (String contentId : contentIdList) {
+          logger.info("차시 저장 중: contentId={}, order={}", contentId, maxOrder);
+          int result = lectureService.addContentToLecture(
+              lectureId,
+              contentId,
+              tenantId,
+              maxOrder,  // 최대 order + 1로 설정 (새 차시를 맨 뒤에 추가)
+              lectureContentTitle,
+              lectureContentDesc
+          );
+          if (result > 0) {
+            successCount++;
+            maxOrder++;  // 다음 차시를 위해 order 증가
+            logger.info("차시 저장 성공: contentId={}", contentId);
+          } else {
+            logger.warn("차시 저장 실패: contentId={}", contentId);
+          }
+        }
       
       if (successCount == 0) {
         logger.warn("차시 추가 실패: DB 저장 실패");
