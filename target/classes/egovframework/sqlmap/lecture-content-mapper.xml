@@ -44,17 +44,23 @@
         VALUES (#{lectureId}, #{contentId}, #{tenantId}, #{contentOrder}, #{lectureContentTitle}, #{lectureContentDesc}, NOW(), NOW())
     </insert>
     
-    <!-- 강의-콘텐츠 매핑 수정 -->
-    <update id="updateLectureContent" parameterType="LectureContentVO">
-        UPDATE tb_lecture_content
-        SET content_order = #{contentOrder},
-            lecture_content_title = #{lectureContentTitle},
-            lecture_content_desc = #{lectureContentDesc},
-            upd_dt = NOW()
-        WHERE lecture_id = #{lectureId}
-        AND content_id = #{contentId}
-        AND tenant_id = #{tenantId}
-    </update>
+     <!-- 강의-콘텐츠 매핑 수정 (선택적 UPDATE: null 값은 기존 데이터 유지) -->
+     <update id="updateLectureContent" parameterType="LectureContentVO">
+         UPDATE tb_lecture_content
+         SET upd_dt = NOW()
+         <if test="contentOrder != null">
+             , content_order = #{contentOrder}
+         </if>
+         <if test="lectureContentTitle != null">
+             , lecture_content_title = #{lectureContentTitle}
+         </if>
+         <if test="lectureContentDesc != null">
+             , lecture_content_desc = #{lectureContentDesc}
+         </if>
+         WHERE lecture_id = #{lectureId}
+         AND content_id = #{contentId}
+         AND tenant_id = #{tenantId}
+     </update>
     
     <!-- 강의별 강의-콘텐츠 매핑 삭제 -->
     <delete id="deleteByLectureId">

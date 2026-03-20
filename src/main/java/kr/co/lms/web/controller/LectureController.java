@@ -107,10 +107,33 @@ public class LectureController {
     
     List<ContentVO> availableContents = contentService.selectContentList(searchVO);
     
+    // 📌 이미 추가된 콘텐츠를 availableContents에서 제외 (중복 방지)
+    List<String> alreadyAddedIds = new ArrayList<>();
+    if (lecture.getContents() != null) {
+      for (ContentVO content : lecture.getContents()) {
+        if (content.getContentId() != null) {
+          alreadyAddedIds.add(content.getContentId());
+        }
+      }
+    }
+    
+    // availableContents 필터링 (이미 추가된 콘텐츠 제거)
+    if (!alreadyAddedIds.isEmpty() && availableContents != null) {
+      List<ContentVO> filteredContents = new ArrayList<>();
+      for (ContentVO content : availableContents) {
+        if (!alreadyAddedIds.contains(content.getContentId())) {
+          filteredContents.add(content);
+        }
+      }
+      availableContents = filteredContents;
+      logger.info("모달용 콘텐츠 필터링: 전체 {} 개 → 추가 가능 {} 개 (이미 추가됨: {})",
+          contentService.selectContentList(searchVO).size(), availableContents.size(), alreadyAddedIds.size());
+    }
+    
     logger.info("강의 상세 조회: tenantId={}, 사용 가능한 콘텐츠 {} 개", tenantId, availableContents != null ? availableContents.size() : 0);
     
     model.addAttribute("lecture", lecture);
-    model.addAttribute("availableContents", availableContents);  // 모달용 콘텐츠 목록
+    model.addAttribute("availableContents", availableContents);  // 모달용 콘텐츠 목록 (중복 제외됨)
     return "lecture/view";
   }
 
@@ -377,11 +400,20 @@ public class LectureController {
       // 5️⃣ 리다이렉트 응답
       return "redirect:/lecture/view?lectureId=" + lectureId;
       
-    } catch (Exception e) {
-      logger.error("차시 추가 중 오류: {}", e.getMessage(), e);
-      model.addAttribute("errorMessage", "차시 추가 중 오류가 발생했습니다.");
-      return "redirect:/lecture/view?lectureId=" + lectureId;
-    }
+     } catch (Exception e) {
+       String errorMsg = "차시 추가 중 오류가 발생했습니다.";
+       
+       // 중복 키 오류 처리 (SQLIntegrityConstraintViolationException)
+       if (e.getCause() != null && e.getCause().toString().contains("Duplicate entry")) {
+         errorMsg = "이미 추가된 콘텐츠입니다. 페이지를 새로고침 후 다시 시도해주세요.";
+         logger.warn("❌ 중복 키 오류: {}", e.getMessage());
+       } else {
+         logger.error("차시 추가 중 오류: {}", e.getMessage(), e);
+       }
+       
+       model.addAttribute("errorMessage", errorMsg);
+       return "redirect:/lecture/view?lectureId=" + lectureId;
+     }
   }
 
   /**

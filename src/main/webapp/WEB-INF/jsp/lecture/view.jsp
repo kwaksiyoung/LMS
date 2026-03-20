@@ -202,21 +202,24 @@
                                     <label style="display: block; margin-bottom: 10px; font-weight: bold;">콘텐츠 선택</label>
                                     <div id="contentList" style="max-height: 300px; overflow-y: auto; border: 1px solid #ddd; border-radius: 5px; padding: 10px;">
                                         <c:choose>
-                                            <c:when test="${not empty availableContents}">
-                                                 <c:forEach var="content" items="${availableContents}">
-                                                    <label style="display: block; padding: 10px; margin-bottom: 8px; border: 1px solid #e0e0e0; border-radius: 4px; cursor: pointer; transition: background 0.2s;">
-                                                        <input type="radio" name="contentIds" value="${content.contentId}" style="margin-right: 8px;" />
-                                                        <strong>${not empty content.contentTitle ? content.contentTitle : '(제목 없음)'}</strong>
-                                                        <c:if test="${not empty content.durationMinutes}">
-                                                            <span style="color: #999; margin-left: 10px;">⏱️ ${content.durationMinutes}분</span>
-                                                        </c:if>
-                                                    </label>
-                                                </c:forEach>
-                                            </c:when>
-                                            <c:otherwise>
-                                                <p style="color: #999; padding: 20px; text-align: center;">사용 중인 콘텐츠가 없습니다.<br/><small>콘텐츠 관리에서 콘텐츠를 등록해주세요.</small></p>
-                                            </c:otherwise>
-                                        </c:choose>
+                                             <c:when test="${not empty availableContents}">
+                                                  <c:forEach var="content" items="${availableContents}">
+                                                     <label style="display: block; padding: 10px; margin-bottom: 8px; border: 1px solid #e0e0e0; border-radius: 4px; cursor: pointer; transition: background 0.2s;">
+                                                         <input type="radio" name="contentIds" value="${content.contentId}" style="margin-right: 8px;" />
+                                                         <strong>${not empty content.contentTitle ? content.contentTitle : '(제목 없음)'}</strong>
+                                                         <c:if test="${not empty content.durationMinutes}">
+                                                             <span style="color: #999; margin-left: 10px;">⏱️ ${content.durationMinutes}분</span>
+                                                         </c:if>
+                                                     </label>
+                                                 </c:forEach>
+                                             </c:when>
+                                             <c:otherwise>
+                                                 <p style="color: #d9534f; padding: 20px; text-align: center; background: #f8f9fa; border-radius: 4px;">
+                                                     ℹ️ 추가할 수 있는 콘텐츠가 없습니다.<br/>
+                                                     <small style="color: #999;">모든 콘텐츠가 이미 이 강의에 추가되었거나, 등록된 콘텐츠가 없습니다.</small>
+                                                 </p>
+                                             </c:otherwise>
+                                         </c:choose>
                                     </div>
                                 </div>
                                 
