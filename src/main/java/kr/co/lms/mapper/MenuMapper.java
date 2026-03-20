@@ -52,4 +52,21 @@ public interface MenuMapper {
      * 메뉴 수 조회 (검색/페이징)
      */
     int selectMenuListWithSearchCount(MenuVO menuVO);
+    
+    /**
+     * 메뉴 일괄 등록 (벌크 인서트)
+     */
+    int insertMenuBatch(List<MenuVO> menuList);
+    
+    /**
+     * 메뉴 순서 변경 (sort_order 업데이트)
+     */
+    int updateMenuSortOrder(MenuVO menuVO);
+    
+    /**
+     * 메뉴 사용여부 일괄 변경 (여러 메뉴의 use_yn 업데이트)
+     */
+    int updateMenuUseYnBatch(@Param("menuIds") List<String> menuIds, 
+                             @Param("useYn") String useYn, 
+                             @Param("tenantId") String tenantId);
 }

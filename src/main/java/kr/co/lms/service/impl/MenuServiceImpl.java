@@ -272,4 +272,96 @@ public class MenuServiceImpl implements MenuService {
                 roleMenuVO.getRoleCd(), roleMenuVO.getTenantId());
         return roleMenuMapper.countMenusByRole(roleMenuVO);
     }
+
+    /**
+     * 메뉴 일괄 등록 (벌크 인서트)
+     */
+    @Override
+    public int insertMenuBatch(List<MenuVO> menuList) {
+        logger.info("메뉴 일괄 등록 시작: 개수={}", menuList != null ? menuList.size() : 0);
+        
+        if (menuList == null || menuList.isEmpty()) {
+            logger.warn("등록할 메뉴가 없습니다.");
+            return 0;
+        }
+        
+        // 메뉴 일괄 등록
+        int result = menuMapper.insertMenuBatch(menuList);
+        
+        if (result > 0) {
+            logger.info("메뉴 일괄 등록 성공: {}건", result);
+            
+            // 역할 매핑이 있는 경우 처리
+            for (MenuVO menu : menuList) {
+                if (menu.getSelectedRoles() != null && !menu.getSelectedRoles().isEmpty()) {
+                    List<RoleMenuVO> roleMenuList = new java.util.ArrayList<>();
+                    for (String roleCd : menu.getSelectedRoles()) {
+                        RoleMenuVO roleMenuVO = new RoleMenuVO();
+                        roleMenuVO.setRoleCd(roleCd);
+                        roleMenuVO.setMenuId(menu.getMenuId());
+                        roleMenuVO.setTenantId(menu.getTenantId());
+                        roleMenuList.add(roleMenuVO);
+                    }
+                    
+                    if (!roleMenuList.isEmpty()) {
+                        int roleMenuResult = roleMenuMapper.insertRoleMenuBatch(roleMenuList);
+                        logger.info("메뉴 {}에 대한 역할 매핑 등록 완료: {}건", 
+                                menu.getMenuId(), roleMenuResult);
+                    }
+                }
+            }
+        } else {
+            logger.warn("메뉴 일괄 등록 실패");
+        }
+        
+        return result;
+    }
+
+    /**
+     * 메뉴 순서 변경
+     */
+    @Override
+    public int updateMenuSortOrder(String menuId, int newSortOrder, String tenantId) {
+        logger.info("메뉴 순서 변경: menuId={}, newSortOrder={}, tenantId={}", 
+                menuId, newSortOrder, tenantId);
+        
+        MenuVO menuVO = new MenuVO();
+        menuVO.setMenuId(menuId);
+        menuVO.setSortOrder(newSortOrder);
+        menuVO.setTenantId(tenantId);
+        
+        int result = menuMapper.updateMenuSortOrder(menuVO);
+        
+        if (result > 0) {
+            logger.info("메뉴 순서 변경 성공: menuId={}, newSortOrder={}", menuId, newSortOrder);
+        } else {
+            logger.warn("메뉴 순서 변경 실패: menuId={}, tenantId={}", menuId, tenantId);
+        }
+        
+        return result;
+    }
+
+    /**
+     * 메뉴 사용여부 일괄 변경
+     */
+    @Override
+    public int updateMenuUseYnBatch(List<String> menuIds, String useYn, String tenantId) {
+        logger.info("메뉴 사용여부 일괄 변경: 개수={}, useYn={}, tenantId={}", 
+                menuIds != null ? menuIds.size() : 0, useYn, tenantId);
+        
+        if (menuIds == null || menuIds.isEmpty()) {
+            logger.warn("변경할 메뉴가 없습니다.");
+            return 0;
+        }
+        
+        int result = menuMapper.updateMenuUseYnBatch(menuIds, useYn, tenantId);
+        
+        if (result > 0) {
+            logger.info("메뉴 사용여부 일괄 변경 성공: {}건", result);
+        } else {
+            logger.warn("메뉴 사용여부 일괄 변경 실패");
+        }
+        
+        return result;
+    }
 }

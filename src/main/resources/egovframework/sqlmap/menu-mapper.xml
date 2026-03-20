@@ -91,4 +91,35 @@
             AND menu_nm LIKE CONCAT('%', #{searchKeyword}, '%')
         </if>
     </select>
+    
+    <!-- 메뉴 일괄 등록 (벌크 인서트) -->
+    <insert id="insertMenuBatch" parameterType="java.util.List">
+        INSERT INTO tb_menu (menu_id, tenant_id, menu_nm, menu_url, menu_icon, sort_order, parent_menu_id, use_yn, reg_dt, upd_dt)
+        VALUES
+        <foreach collection="list" item="menu" separator=",">
+            (#{menu.menuId}, #{menu.tenantId}, #{menu.menuNm}, #{menu.menuUrl}, #{menu.menuIcon}, 
+             #{menu.sortOrder}, #{menu.parentMenuId}, #{menu.useYn}, NOW(), NOW())
+        </foreach>
+    </insert>
+    
+    <!-- 메뉴 순서 변경 (sort_order 업데이트) -->
+    <update id="updateMenuSortOrder" parameterType="MenuVO">
+        UPDATE tb_menu
+        SET sort_order = #{sortOrder},
+            upd_dt = NOW()
+        WHERE menu_id = #{menuId}
+        AND tenant_id = #{tenantId}
+    </update>
+    
+    <!-- 메뉴 사용여부 일괄 변경 (여러 메뉴의 use_yn 업데이트) -->
+    <update id="updateMenuUseYnBatch">
+        UPDATE tb_menu
+        SET use_yn = #{useYn},
+            upd_dt = NOW()
+        WHERE tenant_id = #{tenantId}
+        AND menu_id IN
+        <foreach collection="menuIds" item="menuId" open="(" separator="," close=")">
+            #{menuId}
+        </foreach>
+    </update>
 </mapper>

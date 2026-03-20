@@ -98,4 +98,19 @@ public interface MenuService {
      * 역할별 메뉴 수 조회 (특정 역할이 접근 가능한 메뉴 개수)
      */
     int countMenusByRole(RoleMenuVO roleMenuVO);
+    
+    /**
+     * 메뉴 일괄 등록 (벌크 인서트)
+     */
+    int insertMenuBatch(List<MenuVO> menuList);
+    
+    /**
+     * 메뉴 순서 변경
+     */
+    int updateMenuSortOrder(String menuId, int newSortOrder, String tenantId);
+    
+    /**
+     * 메뉴 사용여부 일괄 변경
+     */
+    int updateMenuUseYnBatch(List<String> menuIds, String useYn, String tenantId);
 }
