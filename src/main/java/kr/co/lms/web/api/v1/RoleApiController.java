@@ -57,7 +57,7 @@ public class RoleApiController {
     logger.info("역할 상세 조회 API: roleCd={}", roleCd);
 
     // JWT 토큰에서 tenantId 추출
-    String tenantId = ApiAuthUtil.getTenantId(request);
+    String tenantId = ApiAuthUtil.getCurrentTenantId(request);
     if (tenantId == null || tenantId.isEmpty()) {
       return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
           .body(ApiResponse.error("테넌트 정보를 찾을 수 없습니다."));
@@ -146,7 +146,7 @@ public class RoleApiController {
     logger.info("역할 삭제 API: roleCd={}", roleCd);
 
     // JWT 토큰에서 tenantId 추출
-    String tenantId = ApiAuthUtil.getTenantId(request);
+    String tenantId = ApiAuthUtil.getCurrentTenantId(request);
     if (tenantId == null || tenantId.isEmpty()) {
       return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
           .body(ApiResponse.error("테넌트 정보를 찾을 수 없습니다."));
