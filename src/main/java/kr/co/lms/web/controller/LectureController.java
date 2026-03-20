@@ -282,20 +282,34 @@ public class LectureController {
       return "redirect:/lecture/view?lectureId=" + lectureId;
     }
     
-    // 4️⃣ 비즈니스 로직
-    try {
-      int successCount = 0;
-      for (String contentId : contentIds) {
-        int result = lectureService.addContentToLecture(
-            lectureId,
-            contentId,
-            tenantId,
-            0,  // contentOrder (기본값)
-            lectureContentTitle,
-            lectureContentDesc
-        );
-        if (result > 0) successCount++;
-      }
+     // 4️⃣ 비즈니스 로직
+     try {
+       // 현재 최대 contentOrder 조회
+       LectureVO lecture = lectureService.selectLectureWithContentsOptimized(lectureId);
+       int maxOrder = 0;
+       if (lecture != null && lecture.getContents() != null) {
+         for (ContentVO content : lecture.getContents()) {
+           if (content.getContentOrder() != null && content.getContentOrder() >= maxOrder) {
+             maxOrder = content.getContentOrder() + 1;
+           }
+         }
+       }
+       
+       int successCount = 0;
+       for (String contentId : contentIds) {
+         int result = lectureService.addContentToLecture(
+             lectureId,
+             contentId,
+             tenantId,
+             maxOrder,  // 최대 order + 1로 설정 (새 차시를 맨 뒤에 추가)
+             lectureContentTitle,
+             lectureContentDesc
+         );
+         if (result > 0) {
+           successCount++;
+           maxOrder++;  // 다음 차시를 위해 order 증가
+         }
+       }
       
       if (successCount == 0) {
         logger.warn("차시 추가 실패: DB 저장 실패");
