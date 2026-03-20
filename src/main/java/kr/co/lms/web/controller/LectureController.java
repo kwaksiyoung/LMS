@@ -264,8 +264,13 @@ public class LectureController {
       HttpSession session,
       Model model) {
     
-    logger.info("차시 추가 요청: lectureId={}, contentIds={}, title={}, desc={}", 
-        lectureId, contentIds, lectureContentTitle, lectureContentDesc);
+    // ===== 디버깅: 모든 파라미터 로깅 =====
+    logger.info("========== /addContent 요청 수신 ==========");
+    logger.info("lectureId 수신값: [{}] (null: {})", lectureId, lectureId == null);
+    logger.info("contentIds 수신값: [{}] (null: {}, empty: {})", 
+        contentIds, contentIds == null, contentIds != null && contentIds.trim().isEmpty());
+    logger.info("lectureContentTitle: [{}]", lectureContentTitle);
+    logger.info("lectureContentDesc: [{}]", lectureContentDesc);
     
     // 1️⃣ 권한 검증
     if (!authorizationUtil.isAdmin(session)) {
@@ -281,16 +286,19 @@ public class LectureController {
     // 3️⃣ contentIds를 List로 변환 (라디오 버튼은 단일 값만 전송)
     List<String> contentIdList = new ArrayList<>();
     if (contentIds != null && !contentIds.trim().isEmpty()) {
+      logger.info("contentIds 처리: [{}] -> List에 추가", contentIds.trim());
       contentIdList.add(contentIds.trim()); // 라디오 버튼 선택값 하나를 리스트에 추가
+    } else {
+      logger.warn("contentIds 처리: null 또는 empty - List에 추가 안 함");
     }
     
     // 4️⃣ 검증
     if (contentIdList.isEmpty()) {
-      logger.warn("차시 추가 실패: 콘텐츠 미선택");
+      logger.warn("❌ 차시 추가 실패: 콘텐츠 미선택 (contentIdList 비어있음)");
       model.addAttribute("errorMessage", "최소 1개의 콘텐츠를 선택하세요.");
       return "redirect:/lecture/view?lectureId=" + lectureId;
     }
-    logger.info("검증 통과: {} 개 콘텐츠 선택됨", contentIdList.size());
+    logger.info("✅ 검증 통과: {} 개 콘텐츠 선택됨", contentIdList.size());
     
       // 4️⃣ 비즈니스 로직
        try {
