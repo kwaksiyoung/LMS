@@ -127,8 +127,8 @@
                             <c:forEach var="content" items="${lecture.contents}" varStatus="status">
                                 <div class="content-item lecture-content-item" data-content-id="${content.contentId}" style="padding: 15px; border: 1px solid #ddd; border-radius: 6px; margin-bottom: 12px;">
                                     <div style="display: flex; align-items: center; gap: 15px;">
-                                        <div class="content-order" style="min-width: 40px;">
-                                            <strong style="font-size: 18px; color: #667eea;">${status.index + 1}</strong>
+                                        <div class="content-order">
+                                            <strong>${status.index + 1}</strong>
                                         </div>
                                         <div style="flex: 1;">
                                             <c:if test="${not empty content.lectureContentTitle}">
