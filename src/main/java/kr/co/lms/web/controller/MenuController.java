@@ -254,8 +254,11 @@ public class MenuController {
 
     /**
      * 메뉴 수정 (역할 매핑 변경 포함)
+     * 
+     * HTML form은 GET/POST만 지원하므로 @PostMapping 사용
+     * REST API는 @PutMapping 사용 (MenuApiController에서 처리)
      */
-    @PutMapping("/{menuId}")
+    @PostMapping("/{menuId}")
     public String updateMenu(
             @PathVariable String menuId,
             MenuVO menuVO,
@@ -317,8 +320,12 @@ public class MenuController {
 
     /**
      * 메뉴 삭제
+     * 
+     * HTML form은 GET/POST만 지원하므로 @PostMapping 사용
+     * URL: POST /menu/{menuId}/delete
+     * REST API는 @DeleteMapping 사용 (MenuApiController에서 처리)
      */
-    @DeleteMapping("/{menuId}")
+    @PostMapping("/{menuId}/delete")
     public String deleteMenu(
             @PathVariable String menuId,
             HttpSession session,

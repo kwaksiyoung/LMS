@@ -386,7 +386,6 @@
             </div>
             
             <form method="post" action="${pageContext.request.contextPath}/menu/${menu.menuId}">
-                <input type="hidden" name="_method" value="PUT">
                 
                 <div class="form-row">
                     <div class="form-group">

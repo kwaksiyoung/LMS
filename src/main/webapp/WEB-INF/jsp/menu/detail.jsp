@@ -439,8 +439,7 @@
             
             <div class="actions">
                 <a href="${pageContext.request.contextPath}/menu/${menu.menuId}/edit" class="btn btn-edit">✏️ 수정</a>
-                <form method="post" action="${pageContext.request.contextPath}/menu/${menu.menuId}" style="display:inline;" onsubmit="return confirm('정말 삭제하시겠습니까?');">
-                    <input type="hidden" name="_method" value="DELETE">
+                <form method="post" action="${pageContext.request.contextPath}/menu/${menu.menuId}/delete" style="display:inline;" onsubmit="return confirm('정말 삭제하시겠습니까?');">
                     <button type="submit" class="btn btn-delete">🗑️ 삭제</button>
                 </form>
                 <a href="${pageContext.request.contextPath}/menu/list" class="btn btn-back">돌아가기</a>
