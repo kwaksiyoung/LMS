@@ -5,6 +5,9 @@ import kr.co.lms.mapper.RoleMenuMapper;
 import kr.co.lms.service.MenuService;
 import kr.co.lms.vo.MenuVO;
 import kr.co.lms.vo.RoleMenuVO;
+import kr.co.lms.web.exception.MenuNotFoundException;
+import kr.co.lms.web.exception.MenuHasChildrenException;
+import kr.co.lms.web.exception.MenuDeletionException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import lombok.RequiredArgsConstructor;
@@ -89,24 +92,70 @@ public class MenuServiceImpl implements MenuService {
 
     /**
      * 메뉴 삭제 (논리적 삭제)
+     * 
+     * 트랜잭션 안전화:
+     * 1. 역할-메뉴 매핑 삭제 (Cascading delete)
+     * 2. 메뉴 삭제
+     * 3. 모두 실패하거나 모두 성공 (원자성 보장)
      */
     @Override
+    @Transactional  // 🔴 CRITICAL: 트랜잭션 보장으로 일관성 유지
     public int deleteMenu(MenuVO menuVO) {
         logger.info("메뉴 삭제: menuId={}, tenantId={}", menuVO.getMenuId(), menuVO.getTenantId());
         
-        // 메뉴 삭제 전 해당 메뉴의 역할 매핑 삭제
-        RoleMenuVO roleMenuVO = new RoleMenuVO();
-        roleMenuVO.setMenuId(menuVO.getMenuId());
-        roleMenuVO.setTenantId(menuVO.getTenantId());
-        roleMenuMapper.deleteRoleMenusByMenu(roleMenuVO);
-        
-        int result = menuMapper.deleteMenu(menuVO);
-        if (result > 0) {
-            logger.info("메뉴 삭제 성공: menuId={}, tenantId={}", menuVO.getMenuId(), menuVO.getTenantId());
-        } else {
-            logger.warn("메뉴 삭제 실패: menuId={}, tenantId={}", menuVO.getMenuId(), menuVO.getTenantId());
+        try {
+            // 1단계: 메뉴 존재 확인
+            MenuVO existingMenu = menuMapper.selectMenu(menuVO);
+            if (existingMenu == null) {
+                logger.warn("메뉴를 찾을 수 없습니다: menuId={}, tenantId={}", 
+                           menuVO.getMenuId(), menuVO.getTenantId());
+                throw new MenuNotFoundException("메뉴를 찾을 수 없습니다.");
+            }
+            
+            // 2단계: 자식 메뉴 확인 (선택사항: 자식이 있으면 삭제 불가)
+            // 만약 자식 메뉴까지 함께 삭제하고 싶으면 이 부분을 주석 처리하세요.
+            MenuVO childSearchVO = new MenuVO();
+            childSearchVO.setParentMenuId(menuVO.getMenuId());
+            childSearchVO.setTenantId(menuVO.getTenantId());
+            int childCount = menuMapper.selectMenuCount(childSearchVO);
+            
+            if (childCount > 0) {
+                logger.warn("자식 메뉴가 있어서 삭제 불가: menuId={}, childCount={}", 
+                           menuVO.getMenuId(), childCount);
+                throw new MenuHasChildrenException("자식 메뉴가 있어서 삭제할 수 없습니다.");
+            }
+            
+            // 3단계: 역할 매핑 삭제 (Cascading delete)
+            RoleMenuVO roleMenuVO = new RoleMenuVO();
+            roleMenuVO.setMenuId(menuVO.getMenuId());
+            roleMenuVO.setTenantId(menuVO.getTenantId());
+            int deletedRoleCount = roleMenuMapper.deleteRoleMenusByMenu(roleMenuVO);
+            logger.info("역할 매핑 삭제 완료: menuId={}, deletedCount={}", 
+                       menuVO.getMenuId(), deletedRoleCount);
+            
+            // 4단계: 메뉴 삭제
+            int result = menuMapper.deleteMenu(menuVO);
+            if (result > 0) {
+                logger.info("메뉴 삭제 성공: menuId={}, tenantId={}, 역할삭제건={}", 
+                           menuVO.getMenuId(), menuVO.getTenantId(), deletedRoleCount);
+            } else {
+                logger.warn("메뉴 삭제 실패: menuId={}, tenantId={}", 
+                           menuVO.getMenuId(), menuVO.getTenantId());
+                throw new MenuDeletionException("메뉴 삭제에 실패했습니다.");
+            }
+            
+            return result;
+            
+        } catch (MenuNotFoundException | MenuHasChildrenException e) {
+            // 비즈니스 예외는 그대로 throw
+            throw e;
+        } catch (org.springframework.dao.DataAccessException e) {
+            logger.error("메뉴 삭제 중 DB 오류: menuId={}", menuVO.getMenuId(), e);
+            throw new MenuDeletionException("메뉴 삭제 중 데이터베이스 오류가 발생했습니다.", e);
+        } catch (Exception e) {
+            logger.error("메뉴 삭제 중 예상치 못한 오류: menuId={}", menuVO.getMenuId(), e);
+            throw new MenuDeletionException("메뉴 삭제에 실패했습니다.", e);
         }
-        return result;
     }
 
     /**
