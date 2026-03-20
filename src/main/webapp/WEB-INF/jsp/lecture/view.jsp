@@ -18,7 +18,7 @@
     <jsp:include page="/WEB-INF/jsp/layout/navigation.jsp" />
 
     <main class="main-content">
-        <div class="container">
+        <div class="container container-wide">
             <div class="page-header">
                 <h1>📖 강의 상세 정보</h1>
             </div>
