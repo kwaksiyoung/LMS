@@ -415,12 +415,12 @@
                     </div>
                 </div>
                 
-                <div class="detail-field">
-                    <div class="detail-label">등록일</div>
-                    <div class="detail-value">
-                        <fmt:formatDate value="${menu.regDt}" pattern="yyyy-MM-dd HH:mm:ss" />
-                    </div>
-                </div>
+                 <div class="detail-field">
+                     <div class="detail-label">등록일</div>
+                     <div class="detail-value">
+                         ${menu.regDt}
+                     </div>
+                 </div>
             </div>
             
             <div class="detail-field" style="grid-column: 1/-1; border-bottom: 1px solid #eee; padding-bottom: 20px; margin-bottom: 0;">
