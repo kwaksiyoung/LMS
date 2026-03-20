@@ -1,0 +1,126 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="kr.co.lms.mapper.RoleMenuMapper">
+    
+    <!-- ============================================================
+         역할-메뉴 매핑 ResultMap
+         ============================================================ -->
+    <resultMap id="roleMenuMap" type="RoleMenuVO">
+        <id column="role_cd" property="roleCd"/>
+        <id column="menu_id" property="menuId"/>
+        <id column="tenant_id" property="tenantId"/>
+        <result column="reg_dt" property="regDt"/>
+        <result column="role_nm" property="roleNm"/>
+        <result column="menu_nm" property="menuNm"/>
+        <result column="menu_url" property="menuUrl"/>
+    </resultMap>
+    
+    <!-- ============================================================
+         역할별 메뉴 조회 (중요: 사용자 로그인 시 메뉴 구성)
+         ============================================================ -->
+    <select id="selectMenusByRole" parameterType="RoleMenuVO" resultType="MenuVO">
+        SELECT m.menu_id, m.tenant_id, m.menu_nm, m.menu_url, m.menu_icon, 
+               m.sort_order, m.parent_menu_id, m.use_yn, m.reg_dt, m.upd_dt
+        FROM tb_menu m
+        INNER JOIN tb_role_menu rm ON m.menu_id = rm.menu_id AND m.tenant_id = rm.tenant_id
+        WHERE rm.role_cd = #{roleCd}
+        AND m.tenant_id = #{tenantId}
+        AND m.use_yn = 'Y'
+        ORDER BY m.sort_order ASC, m.reg_dt DESC
+    </select>
+    
+    <!-- ============================================================
+         URL별 역할 조회 (접근 제어용: 특정 URL에 접근 가능한 역할 목록)
+         ============================================================ -->
+    <select id="selectRolesByUrl" parameterType="RoleMenuVO" resultType="String">
+        SELECT DISTINCT rm.role_cd
+        FROM tb_role_menu rm
+        INNER JOIN tb_menu m ON m.menu_id = rm.menu_id AND m.tenant_id = rm.tenant_id
+        WHERE m.menu_url = #{menuUrl}
+        AND m.tenant_id = #{tenantId}
+        AND m.use_yn = 'Y'
+    </select>
+    
+    <!-- ============================================================
+         메뉴별 역할 조회 (특정 메뉴에 매핑된 역할 목록)
+         ============================================================ -->
+    <select id="selectRolesByMenu" parameterType="RoleMenuVO" resultType="String">
+        SELECT role_cd
+        FROM tb_role_menu
+        WHERE menu_id = #{menuId}
+        AND tenant_id = #{tenantId}
+        ORDER BY role_cd ASC
+    </select>
+    
+    <!-- ============================================================
+         역할-메뉴 등록 (단일)
+         ============================================================ -->
+    <insert id="insertRoleMenu" parameterType="RoleMenuVO">
+        INSERT INTO tb_role_menu (role_cd, menu_id, tenant_id, reg_dt)
+        VALUES (#{roleCd}, #{menuId}, #{tenantId}, NOW())
+    </insert>
+    
+    <!-- ============================================================
+         역할-메뉴 등록 (일괄)
+         ============================================================ -->
+    <insert id="insertRoleMenuBatch" parameterType="java.util.List">
+        INSERT INTO tb_role_menu (role_cd, menu_id, tenant_id, reg_dt)
+        VALUES
+        <foreach collection="list" item="item" separator=",">
+            (#{item.roleCd}, #{item.menuId}, #{item.tenantId}, NOW())
+        </foreach>
+    </insert>
+    
+    <!-- ============================================================
+         역할별 역할-메뉴 매핑 삭제
+         특정 역할이 등록한 모든 메뉴 매핑 삭제
+         ============================================================ -->
+    <delete id="deleteRoleMenusByRole" parameterType="RoleMenuVO">
+        DELETE FROM tb_role_menu
+        WHERE role_cd = #{roleCd}
+        AND tenant_id = #{tenantId}
+    </delete>
+    
+    <!-- ============================================================
+         메뉴별 역할-메뉴 매핑 삭제
+         특정 메뉴에 매핑된 모든 역할 삭제
+         ============================================================ -->
+    <delete id="deleteRoleMenusByMenu" parameterType="RoleMenuVO">
+        DELETE FROM tb_role_menu
+        WHERE menu_id = #{menuId}
+        AND tenant_id = #{tenantId}
+    </delete>
+    
+    <!-- ============================================================
+         역할-메뉴 매핑 삭제 (단일)
+         ============================================================ -->
+    <delete id="deleteRoleMenu" parameterType="RoleMenuVO">
+        DELETE FROM tb_role_menu
+        WHERE role_cd = #{roleCd}
+        AND menu_id = #{menuId}
+        AND tenant_id = #{tenantId}
+    </delete>
+    
+    <!-- ============================================================
+         역할-메뉴 매핑 존재 여부 확인
+         ============================================================ -->
+    <select id="countRoleMenu" parameterType="RoleMenuVO" resultType="int">
+        SELECT COUNT(*)
+        FROM tb_role_menu
+        WHERE role_cd = #{roleCd}
+        AND menu_id = #{menuId}
+        AND tenant_id = #{tenantId}
+    </select>
+    
+    <!-- ============================================================
+         역할별 메뉴 수 조회 (특정 역할이 접근 가능한 메뉴 개수)
+         ============================================================ -->
+    <select id="countMenusByRole" parameterType="RoleMenuVO" resultType="int">
+        SELECT COUNT(*)
+        FROM tb_role_menu
+        WHERE role_cd = #{roleCd}
+        AND tenant_id = #{tenantId}
+    </select>
+
+</mapper>

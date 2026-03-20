@@ -3,29 +3,47 @@
 
 <mapper namespace="kr.co.lms.mapper.MenuMapper">
     
-    <!-- 메뉴 조회 -->
-    <select id="selectMenu" parameterType="String" resultType="MenuVO">
-        SELECT menu_id, menu_nm, menu_url, menu_icon, sort_order, parent_menu_id, use_yn, reg_dt, upd_dt
+    <!-- 메뉴 조회 (tenant_id 포함) -->
+    <select id="selectMenu" parameterType="MenuVO" resultType="MenuVO">
+        SELECT menu_id, tenant_id, menu_nm, menu_url, menu_icon, sort_order, parent_menu_id, use_yn, reg_dt, upd_dt
         FROM tb_menu
         WHERE menu_id = #{menuId}
+        AND tenant_id = #{tenantId}
         AND use_yn = 'Y'
     </select>
     
     <!-- 메뉴 목록 조회 -->
     <select id="selectMenuList" parameterType="MenuVO" resultType="MenuVO">
-        SELECT menu_id, menu_nm, menu_url, menu_icon, sort_order, parent_menu_id, use_yn, reg_dt, upd_dt
+        SELECT menu_id, tenant_id, menu_nm, menu_url, menu_icon, sort_order, parent_menu_id, use_yn, reg_dt, upd_dt
         FROM tb_menu
-        WHERE 1=1
+        WHERE tenant_id = #{tenantId}
         <if test="useYn != null and useYn != ''">
             AND use_yn = #{useYn}
         </if>
         ORDER BY sort_order ASC, reg_dt DESC
     </select>
     
+    <!-- 메뉴 목록 조회 (검색/페이징) -->
+    <select id="selectMenuListWithSearch" parameterType="MenuVO" resultType="MenuVO">
+        SELECT menu_id, tenant_id, menu_nm, menu_url, menu_icon, sort_order, parent_menu_id, use_yn, reg_dt, upd_dt
+        FROM tb_menu
+        WHERE tenant_id = #{tenantId}
+        <if test="useYn != null and useYn != ''">
+            AND use_yn = #{useYn}
+        </if>
+        <if test="searchKeyword != null and searchKeyword != ''">
+            AND menu_nm LIKE CONCAT('%', #{searchKeyword}, '%')
+        </if>
+        ORDER BY sort_order ASC, reg_dt DESC
+        <if test="startRow != null and pageSize != null">
+            LIMIT #{startRow}, #{pageSize}
+        </if>
+    </select>
+    
     <!-- 메뉴 등록 -->
     <insert id="insertMenu" parameterType="MenuVO">
-        INSERT INTO tb_menu (menu_id, menu_nm, menu_url, menu_icon, sort_order, parent_menu_id, use_yn, reg_dt, upd_dt)
-        VALUES (#{menuId}, #{menuNm}, #{menuUrl}, #{menuIcon}, #{sortOrder}, #{parentMenuId}, #{useYn}, NOW(), NOW())
+        INSERT INTO tb_menu (menu_id, tenant_id, menu_nm, menu_url, menu_icon, sort_order, parent_menu_id, use_yn, reg_dt, upd_dt)
+        VALUES (#{menuId}, #{tenantId}, #{menuNm}, #{menuUrl}, #{menuIcon}, #{sortOrder}, #{parentMenuId}, #{useYn}, NOW(), NOW())
     </insert>
     
     <!-- 메뉴 수정 -->
@@ -39,23 +57,38 @@
             use_yn = #{useYn},
             upd_dt = NOW()
         WHERE menu_id = #{menuId}
+        AND tenant_id = #{tenantId}
     </update>
     
-    <!-- 메뉴 삭제 -->
-    <delete id="deleteMenu" parameterType="String">
+    <!-- 메뉴 삭제 (논리적 삭제) -->
+    <delete id="deleteMenu" parameterType="MenuVO">
         UPDATE tb_menu
         SET use_yn = 'N',
             upd_dt = NOW()
         WHERE menu_id = #{menuId}
+        AND tenant_id = #{tenantId}
     </delete>
     
     <!-- 메뉴 수 조회 -->
     <select id="selectMenuCount" parameterType="MenuVO" resultType="int">
         SELECT COUNT(*)
         FROM tb_menu
-        WHERE 1=1
+        WHERE tenant_id = #{tenantId}
         <if test="useYn != null and useYn != ''">
             AND use_yn = #{useYn}
+        </if>
+    </select>
+    
+    <!-- 메뉴 수 조회 (검색/페이징) -->
+    <select id="selectMenuListWithSearchCount" parameterType="MenuVO" resultType="int">
+        SELECT COUNT(*)
+        FROM tb_menu
+        WHERE tenant_id = #{tenantId}
+        <if test="useYn != null and useYn != ''">
+            AND use_yn = #{useYn}
+        </if>
+        <if test="searchKeyword != null and searchKeyword != ''">
+            AND menu_nm LIKE CONCAT('%', #{searchKeyword}, '%')
         </if>
     </select>
 </mapper>
