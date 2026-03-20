@@ -407,8 +407,8 @@
     </style>
 </head>
 <body>
-    <%@ include file="../layout/header.jsp" %>
-    <%@ include file="../layout/navigation.jsp" %>
+    <jsp:include page="/WEB-INF/jsp/layout/header.jsp" />
+    <jsp:include page="/WEB-INF/jsp/layout/navigation.jsp" />
     
     <div class="container">
         <div class="header">
