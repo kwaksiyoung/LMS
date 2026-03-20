@@ -19,40 +19,28 @@ public interface RoleMenuMapper {
     /**
      * 특정 메뉴에 접근할 수 있는 역할 목록 조회
      * 
-     * @param menuId 메뉴 ID
-     * @param tenantId 고객사 ID
+     * @param roleMenuVO 메뉴 ID, 고객사 ID 포함
      * @return 역할 코드 리스트
      */
-    List<String> selectRolesByMenu(
-        @Param("menuId") String menuId,
-        @Param("tenantId") String tenantId
-    );
+    List<String> selectRolesByMenu(RoleMenuVO roleMenuVO);
 
     /**
      * 특정 역할이 접근할 수 있는 메뉴 목록 조회
      * 사용 가능한 메뉴만 반환 (use_yn = 'Y')
      * 
-     * @param roleCd 역할 코드
-     * @param tenantId 고객사 ID
+     * @param roleMenuVO 역할 코드, 고객사 ID 포함
      * @return 메뉴 리스트 (메뉴명, 메뉴URL 포함)
      */
-    List<MenuVO> selectMenusByRole(
-        @Param("roleCd") String roleCd,
-        @Param("tenantId") String tenantId
-    );
+    List<MenuVO> selectMenusByRole(RoleMenuVO roleMenuVO);
 
     /**
      * 특정 URL에 접근할 수 있는 역할 목록 조회
      * 메뉴 URL로 역할 목록을 조회하여 접근 권한 검증
      * 
-     * @param menuUrl 메뉴 URL
-     * @param tenantId 고객사 ID
+     * @param roleMenuVO 메뉴 URL, 고객사 ID 포함
      * @return 역할 코드 리스트
      */
-    List<String> selectRolesByUrl(
-        @Param("menuUrl") String menuUrl,
-        @Param("tenantId") String tenantId
-    );
+    List<String> selectRolesByUrl(RoleMenuVO roleMenuVO);
 
     /**
      * 역할-메뉴 매핑 추가
@@ -75,65 +63,41 @@ public interface RoleMenuMapper {
      * 특정 역할의 모든 메뉴 매핑 삭제
      * 역할 삭제 시 관련된 모든 메뉴 매핑을 제거
      * 
-     * @param roleCd 역할 코드
-     * @param tenantId 고객사 ID
+     * @param roleMenuVO 역할 코드, 고객사 ID 포함
      * @return 영향받은 행 수
      */
-    int deleteRoleMenusByRole(
-        @Param("roleCd") String roleCd,
-        @Param("tenantId") String tenantId
-    );
+    int deleteRoleMenusByRole(RoleMenuVO roleMenuVO);
 
     /**
      * 특정 메뉴의 모든 역할 매핑 삭제
      * 메뉴 삭제 시 관련된 모든 역할 매핑을 제거
      * 
-     * @param menuId 메뉴 ID
-     * @param tenantId 고객사 ID
+     * @param roleMenuVO 메뉴 ID, 고객사 ID 포함
      * @return 영향받은 행 수
      */
-    int deleteRoleMenusByMenu(
-        @Param("menuId") String menuId,
-        @Param("tenantId") String tenantId
-    );
+    int deleteRoleMenusByMenu(RoleMenuVO roleMenuVO);
 
     /**
      * 특정 역할-메뉴 매핑 삭제
      * 
-     * @param roleCd 역할 코드
-     * @param menuId 메뉴 ID
-     * @param tenantId 고객사 ID
+     * @param roleMenuVO 역할 코드, 메뉴 ID, 고객사 ID 포함
      * @return 영향받은 행 수
      */
-    int deleteRoleMenu(
-        @Param("roleCd") String roleCd,
-        @Param("menuId") String menuId,
-        @Param("tenantId") String tenantId
-    );
+    int deleteRoleMenu(RoleMenuVO roleMenuVO);
 
     /**
      * 특정 역할-메뉴 매핑 존재 여부 확인
      * 
-     * @param roleCd 역할 코드
-     * @param menuId 메뉴 ID
-     * @param tenantId 고객사 ID
+     * @param roleMenuVO 역할 코드, 메뉴 ID, 고객사 ID 포함
      * @return 매핑 존재 여부 (0: 없음, 1: 있음)
      */
-    int countRoleMenu(
-        @Param("roleCd") String roleCd,
-        @Param("menuId") String menuId,
-        @Param("tenantId") String tenantId
-    );
+    int countRoleMenu(RoleMenuVO roleMenuVO);
 
     /**
      * 특정 역할의 메뉴 매핑 개수 조회
      * 
-     * @param roleCd 역할 코드
-     * @param tenantId 고객사 ID
+     * @param roleMenuVO 역할 코드, 고객사 ID 포함
      * @return 메뉴 개수
      */
-    int countMenusByRole(
-        @Param("roleCd") String roleCd,
-        @Param("tenantId") String tenantId
-    );
+    int countMenusByRole(RoleMenuVO roleMenuVO);
 }

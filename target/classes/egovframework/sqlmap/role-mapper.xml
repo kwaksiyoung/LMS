@@ -3,19 +3,20 @@
 
 <mapper namespace="kr.co.lms.mapper.RoleMapper">
     
-    <!-- 역할 전체 조회 -->
-    <select id="selectRole" parameterType="String" resultType="RoleVO">
-        SELECT role_cd, role_nm, role_desc, use_yn, reg_dt, upd_dt
+    <!-- 역할 조회 (코드로, tenant_id 포함) -->
+    <select id="selectRole" parameterType="RoleVO" resultType="RoleVO">
+        SELECT role_cd, tenant_id, role_nm, role_desc, use_yn, reg_dt, upd_dt
         FROM tb_role
         WHERE role_cd = #{roleCd}
+        AND tenant_id = #{tenantId}
         AND use_yn = 'Y'
     </select>
     
-    <!-- 역할 목록 조회 -->
+    <!-- 역할 목록 조회 (tenant_id 포함) -->
     <select id="selectRoleList" parameterType="RoleVO" resultType="RoleVO">
-        SELECT role_cd, role_nm, role_desc, use_yn, reg_dt, upd_dt
+        SELECT role_cd, tenant_id, role_nm, role_desc, use_yn, reg_dt, upd_dt
         FROM tb_role
-        WHERE 1=1
+        WHERE tenant_id = #{tenantId}
         <if test="useYn != null and useYn != ''">
             AND use_yn = #{useYn}
         </if>
@@ -24,8 +25,8 @@
     
     <!-- 역할 등록 -->
     <insert id="insertRole" parameterType="RoleVO">
-        INSERT INTO tb_role (role_cd, role_nm, role_desc, use_yn, reg_dt, upd_dt)
-        VALUES (#{roleCd}, #{roleNm}, #{roleDesc}, #{useYn}, NOW(), NOW())
+        INSERT INTO tb_role (role_cd, tenant_id, role_nm, role_desc, use_yn, reg_dt, upd_dt)
+        VALUES (#{roleCd}, #{tenantId}, #{roleNm}, #{roleDesc}, #{useYn}, NOW(), NOW())
     </insert>
     
     <!-- 역할 수정 -->
@@ -36,21 +37,23 @@
             use_yn = #{useYn},
             upd_dt = NOW()
         WHERE role_cd = #{roleCd}
+        AND tenant_id = #{tenantId}
     </update>
     
-    <!-- 역할 삭제 -->
-    <delete id="deleteRole" parameterType="String">
+    <!-- 역할 삭제 (논리적 삭제) -->
+    <delete id="deleteRole" parameterType="RoleVO">
         UPDATE tb_role
         SET use_yn = 'N',
             upd_dt = NOW()
         WHERE role_cd = #{roleCd}
+        AND tenant_id = #{tenantId}
     </delete>
     
     <!-- 역할 수 조회 -->
     <select id="selectRoleCount" parameterType="RoleVO" resultType="int">
         SELECT COUNT(*)
         FROM tb_role
-        WHERE 1=1
+        WHERE tenant_id = #{tenantId}
         <if test="useYn != null and useYn != ''">
             AND use_yn = #{useYn}
         </if>

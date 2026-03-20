@@ -3,8 +3,8 @@ project:
   description: 전자정부프레임워크 4.2 LMS 개발 
 
 models:
-  default: claude-3-opus
-  fallback: gpt-4o
+  default: anthropic/claude-haiku-4-5-20251001
+  fallback: anthropic/claude-haiku-4-5-20251001
 
 system_prompt: ./prompts/system.md
 
