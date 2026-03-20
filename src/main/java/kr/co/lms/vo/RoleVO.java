@@ -14,6 +14,7 @@ public class RoleVO implements Serializable {
 
     // 기본 정보
     private String roleCd;
+    private String tenantId;    // 멀티테넌시
     private String roleNm;
     private String roleDesc;
     private String useYn;
@@ -48,6 +49,14 @@ public class RoleVO implements Serializable {
 
     public void setRoleCd(String roleCd) {
         this.roleCd = roleCd;
+    }
+
+    public String getTenantId() {
+        return tenantId;
+    }
+
+    public void setTenantId(String tenantId) {
+        this.tenantId = tenantId;
     }
 
     public String getRoleNm() {
@@ -94,6 +103,7 @@ public class RoleVO implements Serializable {
     public String toString() {
         return "RoleVO{" +
                 "roleCd='" + roleCd + '\'' +
+                ", tenantId='" + tenantId + '\'' +
                 ", roleNm='" + roleNm + '\'' +
                 ", roleDesc='" + roleDesc + '\'' +
                 ", useYn='" + useYn + '\'' +

@@ -24,13 +24,13 @@ public class RoleServiceImpl implements RoleService {
     private final RoleMapper roleMapper;
 
     /**
-     * 역할 조회 (코드로)
+     * 역할 조회 (코드 + tenant_id로)
      */
     @Override
     @Transactional(readOnly = true)
-    public RoleVO selectRole(String roleCd) {
-        logger.debug("역할 조회: roleCd={}", roleCd);
-        return roleMapper.selectRole(roleCd);
+    public RoleVO selectRole(RoleVO roleVO) {
+        logger.debug("역할 조회: roleCd={}, tenantId={}", roleVO.getRoleCd(), roleVO.getTenantId());
+        return roleMapper.selectRole(roleVO);
     }
 
     /**
@@ -74,16 +74,16 @@ public class RoleServiceImpl implements RoleService {
     }
 
     /**
-     * 역할 삭제
+     * 역할 삭제 (논리적 삭제)
      */
     @Override
-    public int deleteRole(String roleCd) {
-        logger.info("역할 삭제: roleCd={}", roleCd);
-        int result = roleMapper.deleteRole(roleCd);
+    public int deleteRole(RoleVO roleVO) {
+        logger.info("역할 삭제: roleCd={}, tenantId={}", roleVO.getRoleCd(), roleVO.getTenantId());
+        int result = roleMapper.deleteRole(roleVO);
         if (result > 0) {
-            logger.info("역할 삭제 성공: roleCd={}", roleCd);
+            logger.info("역할 삭제 성공: roleCd={}", roleVO.getRoleCd());
         } else {
-            logger.warn("역할 삭제 실패: roleCd={}", roleCd);
+            logger.warn("역할 삭제 실패: roleCd={}", roleVO.getRoleCd());
         }
         return result;
     }
