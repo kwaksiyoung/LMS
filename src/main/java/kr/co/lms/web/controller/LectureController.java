@@ -249,7 +249,6 @@ public class LectureController {
     logger.info("강의 삭제 성공: lectureId={}", lectureId);
     return "redirect:/lecture/list";
   }
-}
 
   /**
    * 차시 추가 (관리자만)
@@ -290,9 +289,10 @@ public class LectureController {
         int result = lectureService.addContentToLecture(
             lectureId,
             contentId,
+            tenantId,
+            0,  // contentOrder (기본값)
             lectureContentTitle,
-            lectureContentDesc,
-            tenantId
+            lectureContentDesc
         );
         if (result > 0) successCount++;
       }
@@ -398,7 +398,7 @@ public class LectureController {
     
     // 4️⃣ 비즈니스 로직
     try {
-      int result = lectureService.reorderContent(lectureId, contentId, newOrder, tenantId);
+      int result = lectureService.reorderContent(lectureId, contentId, tenantId, newOrder);
       
       if (result == 0) {
         logger.warn("차시 순서 변경 실패: lectureId={}, contentId={}", lectureId, contentId);
@@ -415,4 +415,5 @@ public class LectureController {
       return "redirect:/lecture/view?lectureId=" + lectureId;
     }
   }
+
 }

@@ -26,6 +26,10 @@ public class ContentVO implements Serializable {
     private LocalDateTime regDt;
     private LocalDateTime updDt;
 
+    // 강의-콘텐츠 매핑 정보 (LEFT JOIN 시 포함)
+    private String lectureContentTitle;  // 차시 제목
+    private String lectureContentDesc;   // 차시 설명
+
     // Constructors
     public ContentVO() {
     }
@@ -142,6 +146,22 @@ public class ContentVO implements Serializable {
 
     public void setUpdDt(LocalDateTime updDt) {
         this.updDt = updDt;
+    }
+
+    public String getLectureContentTitle() {
+        return lectureContentTitle;
+    }
+
+    public void setLectureContentTitle(String lectureContentTitle) {
+        this.lectureContentTitle = lectureContentTitle;
+    }
+
+    public String getLectureContentDesc() {
+        return lectureContentDesc;
+    }
+
+    public void setLectureContentDesc(String lectureContentDesc) {
+        this.lectureContentDesc = lectureContentDesc;
     }
 
     @Override

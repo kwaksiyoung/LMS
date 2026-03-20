@@ -6,9 +6,9 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>LMS - 강의 상세</title>
-    <link rel="stylesheet" href="<%= request.getContextPath() %>/css/common.css">
-    <link rel="stylesheet" href="<%= request.getContextPath() %>/css/lecture.css">
-    <link rel="stylesheet" href="<%= request.getContextPath() %>/css/nav.css">
+    <link rel="stylesheet" href="${pageContext.request.contextPath}/css/common.css">
+    <link rel="stylesheet" href="${pageContext.request.contextPath}/css/lecture.css">
+    <link rel="stylesheet" href="${pageContext.request.contextPath}/css/nav.css">
 </head>
 <body>
     <!-- 공통 헤더 포함 -->
@@ -30,10 +30,7 @@
         </c:if>
 
         <c:if test="${not empty lecture}">
-            <% 
-                Boolean isAdmin = (Boolean) session.getAttribute("isAdmin");
-                boolean isAdminUser = isAdmin != null && isAdmin;
-            %>
+            <c:set var="isAdminUser" value="${sessionScope.isAdmin}"/>
 
             <div class="lecture-detail">
                 <div class="detail-section">
@@ -41,8 +38,8 @@
                         <h2>${lecture.lectureNm}</h2>
                         <c:if test="${isAdminUser}">
                         <div class="detail-actions">
-                            <a href="<%= request.getContextPath() %>/lecture/edit?lectureId=${lecture.lectureId}" class="btn btn-secondary">수정</a>
-                            <form method="POST" action="<%= request.getContextPath() %>/lecture/delete" style="display: inline;" 
+                            <a href="${pageContext.request.contextPath}/lecture/edit?lectureId=${lecture.lectureId}" class="btn btn-secondary">수정</a>
+                            <form method="POST" action="${pageContext.request.contextPath}/lecture/delete" style="display: inline;" 
                                   onsubmit="return confirm('정말 삭제하시겠습니까?');">
                                 <input type="hidden" name="lectureId" value="${lecture.lectureId}">
                                 <button type="submit" class="btn btn-danger">삭제</button>
@@ -118,11 +115,11 @@
                 <div class="detail-section">
                     <div class="detail-header">
                         <h3>🎬 차시 구성</h3>
-                        <% if (isAdminUser) { %>
+                        <c:if test="${isAdminUser}">
                         <div class="detail-actions">
                             <button class="btn btn-primary btn-small" onclick="openContentModal('${lecture.lectureId}')">+ 차시 추가</button>
                         </div>
-                        <% } %>
+                        </c:if>
                     </div>
                     
                     <c:if test="${not empty lecture.contents}">
@@ -133,16 +130,23 @@
                                         <strong>${status.index + 1}</strong>
                                     </div>
                                     <div class="content-header">
-                                        <span class="content-title">${content.contentTitle}</span>
-                                        <c:if test="${not empty content.contentType}">
-                                            <span class="badge badge-${content.contentType eq 'VIDEO' ? 'video' : 'document'}">
-                                                <c:choose>
-                                                    <c:when test="${content.contentType eq 'VIDEO'}">동영상</c:when>
-                                                    <c:when test="${content.contentType eq 'DOCUMENT'}">문서</c:when>
-                                                    <c:when test="${content.contentType eq 'LINK'}">링크</c:when>
-                                                    <c:otherwise>${content.contentType}</c:otherwise>
-                                                </c:choose>
-                                            </span>
+                                        <div>
+                                            <span class="content-title">${content.contentTitle}</span>
+                                            <c:if test="${not empty content.contentType}">
+                                                <span class="badge badge-${content.contentType eq 'VIDEO' ? 'video' : 'document'}">
+                                                    <c:choose>
+                                                        <c:when test="${content.contentType eq 'VIDEO'}">동영상</c:when>
+                                                        <c:when test="${content.contentType eq 'DOCUMENT'}">문서</c:when>
+                                                        <c:when test="${content.contentType eq 'LINK'}">링크</c:when>
+                                                        <c:otherwise>${content.contentType}</c:otherwise>
+                                                    </c:choose>
+                                                </span>
+                                            </c:if>
+                                        </div>
+                                        <c:if test="${not empty content.lectureContentTitle}">
+                                        <div style="margin-top: 8px; padding-top: 8px; border-top: 1px solid #eee;">
+                                            <span style="font-weight: bold; color: #2c3e50;">📌 차시 제목: ${content.lectureContentTitle}</span>
+                                        </div>
                                         </c:if>
                                     </div>
                                     <p class="content-desc">${content.contentDesc}</p>
@@ -152,73 +156,31 @@
                                         </c:if>
                                         <span>📅 ${content.regDt}</span>
                                     </div>
-                                    <% if (isAdminUser) { %>
+                                    <c:if test="${isAdminUser}">
                                     <div class="content-actions">
-                                        <form method="POST" action="<%= request.getContextPath() %>/lecture/reorderContent" style="display: inline;">
+                                        <form method="POST" action="${pageContext.request.contextPath}/lecture/reorderContent" style="display: inline;">
                                             <input type="hidden" name="lectureId" value="${lecture.lectureId}">
                                             <input type="hidden" name="contentId" value="${content.contentId}">
-                                            <input type="hidden" name="newOrder" value="<%= status.index - 1 %>">
-                                            <% if (status.index > 0) { %>
+                                            <input type="hidden" name="newOrder" value="${status.index - 1}">
+                                            <c:if test="${status.index > 0}">
                                             <button type="submit" class="btn btn-secondary btn-small">⬆️ 위로</button>
-                                            <% } %>
+                                            </c:if>
                                         </form>
-                                        <form method="POST" action="<%= request.getContextPath() %>/lecture/reorderContent" style="display: inline;">
+                                        <form method="POST" action="${pageContext.request.contextPath}/lecture/reorderContent" style="display: inline;">
                                             <input type="hidden" name="lectureId" value="${lecture.lectureId}">
                                             <input type="hidden" name="contentId" value="${content.contentId}">
-                                            <input type="hidden" name="newOrder" value="<%= status.index + 1 %>">
-                                            <% if (status.index < lecture.contents.size() - 1) { %>
+                                            <input type="hidden" name="newOrder" value="${status.index + 1}">
+                                            <c:if test="${status.index < lecture.contents.size() - 1}">
                                             <button type="submit" class="btn btn-secondary btn-small">⬇️ 아래로</button>
-                                            <% } %>
+                                            </c:if>
                                         </form>
-                                        <form method="POST" action="<%= request.getContextPath() %>/lecture/removeContent" style="display: inline;" onsubmit="return confirm('이 차시를 제거하시겠습니까?');">
-                                            <input type="hidden" name="lectureId" value="${lecture.lectureId}">
-                                            <input type="hidden" name="contentId" value="${content.contentId}">
-                                            <button type="submit" class="btn btn-danger btn-small">🗑️ 제거</button>
-                                        </form>
-                                        <form method="POST" action="<%= request.getContextPath() %>/lecture/reorderContent" style="display: inline;">
-                                            <input type="hidden" name="lectureId" value="${lecture.lectureId}">
-                                            <input type="hidden" name="contentId" value="${content.contentId}">
-                                            <input type="hidden" name="newOrder" value="<%= status.index - 1 %>">
-                                            <% if (status.index > 0) { %>
-                                            <button type="submit" class="btn btn-secondary btn-small">⬆️ 위로</button>
-                                            <% } %>
-                                        </form>
-                                        <form method="POST" action="<%= request.getContextPath() %>/lecture/reorderContent" style="display: inline;">
-                                            <input type="hidden" name="lectureId" value="${lecture.lectureId}">
-                                            <input type="hidden" name="contentId" value="${content.contentId}">
-                                            <input type="hidden" name="newOrder" value="<%= status.index + 1 %>">
-                                            <% if (status.index < lecture.contents.size() - 1) { %>
-                                            <button type="submit" class="btn btn-secondary btn-small">⬇️ 아래로</button>
-                                            <% } %>
-                                        </form>
-                                        <form method="POST" action="<%= request.getContextPath() %>/lecture/removeContent" style="display: inline;" onsubmit="return confirm('이 차시를 제거하시겠습니까?');">
-                                            <input type="hidden" name="lectureId" value="${lecture.lectureId}">
-                                            <input type="hidden" name="contentId" value="${content.contentId}">
-                                            <button type="submit" class="btn btn-danger btn-small">🗑️ 제거</button>
-                                        </form>
-                                        <form method="POST" action="<%= request.getContextPath() %>/lecture/reorderContent" style="display: inline;">
-                                            <input type="hidden" name="lectureId" value="${lecture.lectureId}">
-                                            <input type="hidden" name="contentId" value="${content.contentId}">
-                                            <input type="hidden" name="newOrder" value="<%= status.index - 1 %>">
-                                            <% if (status.index > 0) { %>
-                                            <button type="submit" class="btn btn-secondary btn-small">⬆️ 위로</button>
-                                            <% } %>
-                                        </form>
-                                        <form method="POST" action="<%= request.getContextPath() %>/lecture/reorderContent" style="display: inline;">
-                                            <input type="hidden" name="lectureId" value="${lecture.lectureId}">
-                                            <input type="hidden" name="contentId" value="${content.contentId}">
-                                            <input type="hidden" name="newOrder" value="<%= status.index + 1 %>">
-                                            <% if (status.index < lecture.contents.size() - 1) { %>
-                                            <button type="submit" class="btn btn-secondary btn-small">⬇️ 아래로</button>
-                                            <% } %>
-                                        </form>
-                                        <form method="POST" action="<%= request.getContextPath() %>/lecture/removeContent" style="display: inline;" onsubmit="return confirm('이 차시를 제거하시겠습니까?');">
+                                        <form method="POST" action="${pageContext.request.contextPath}/lecture/removeContent" style="display: inline;" onsubmit="return confirm('이 차시를 제거하시겠습니까?');">
                                             <input type="hidden" name="lectureId" value="${lecture.lectureId}">
                                             <input type="hidden" name="contentId" value="${content.contentId}">
                                             <button type="submit" class="btn btn-danger btn-small">🗑️ 제거</button>
                                         </form>
                                     </div>
-                                    <% } %>
+                                    </c:if>
                                 </div>
                             </c:forEach>
                         </div>
@@ -226,18 +188,18 @@
                     <c:if test="${empty lecture.contents}">
                         <div class="empty-state">
                             <p>📭 등록된 차시가 없습니다.</p>
-                            <% if (isAdminUser) { %>
+                            <c:if test="${isAdminUser}">
                             <button class="btn btn-primary" onclick="openContentModal('${lecture.lectureId}')">첫 차시 추가하기</button>
-                            <% } %>
+                            </c:if>
                         </div>
                     </c:if>
                 </div>
 
                 <!-- 콘텐츠 선택 모달 (관리자용) -->
-                <% if (isAdminUser) { %>
+                <c:if test="${isAdminUser}">
                 <div id="contentModal" class="modal" style="display: none;">
                     <div class="modal-content" style="max-width: 600px;">
-                        <form id="contentForm" method="POST" action="<%= request.getContextPath() %>/lecture/addContent" onsubmit="return validateForm()">
+                        <form id="contentForm" method="POST" action="${pageContext.request.contextPath}/lecture/addContent" onsubmit="return validateForm()">
                             <div class="modal-header">
                                 <h2>차시 추가</h2>
                                 <button type="button" class="close-btn" onclick="closeContentModal()">&times;</button>
@@ -252,29 +214,23 @@
                                 <div style="margin-bottom: 20px;">
                                     <label style="display: block; margin-bottom: 10px; font-weight: bold;">콘텐츠 선택</label>
                                     <div id="contentList" style="max-height: 300px; overflow-y: auto; border: 1px solid #ddd; border-radius: 5px; padding: 10px;">
-                                        <% 
-                                            java.util.List<kr.co.lms.vo.ContentVO> availableContents = 
-                                                (java.util.List<kr.co.lms.vo.ContentVO>) request.getAttribute("availableContents");
-                                            
-                                            if (availableContents != null && availableContents.size() > 0) {
-                                                for (kr.co.lms.vo.ContentVO content : availableContents) {
-                                        %>
-                                            <label class="content-checkbox">
-                                                <input type="checkbox" name="contentIds" value="<%= content.getContentId() %>" />
-                                                <strong><%= content.getContentTitle() != null ? content.getContentTitle() : "(제목 없음)" %></strong> <br/>
-                                                <small style="color: #666;"><%= content.getContentDesc() != null ? content.getContentDesc() : "" %></small>
-                                                <small style="color: #999; display: block; margin-top: 5px;">
-                                                    유형: <%= content.getContentType() != null ? content.getContentType() : "-" %> | 시간: <%= content.getDurationMinutes() != null ? content.getDurationMinutes() : "-" %>분
-                                                </small>
-                                            </label>
-                                        <% 
-                                                }
-                                            } else {
-                                        %>
-                                            <p style="color: #999; padding: 20px; text-align: center;">사용 중인 콘텐츠가 없습니다.<br/><small>콘텐츠 관리에서 콘텐츠를 등록해주세요.</small></p>
-                                        <% 
-                                            }
-                                        %>
+                                        <c:choose>
+                                            <c:when test="${not empty availableContents}">
+                                                <c:forEach var="content" items="${availableContents}">
+                                                    <label class="content-checkbox">
+                                                        <input type="radio" name="contentIds" value="${content.contentId}" />
+                                                        <strong>${not empty content.contentTitle ? content.contentTitle : '(제목 없음)'}</strong> <br/>
+                                                        <small style="color: #666;">${content.contentDesc}</small>
+                                                        <small style="color: #999; display: block; margin-top: 5px;">
+                                                            유형: ${not empty content.contentType ? content.contentType : '-'} | 시간: ${not empty content.durationMinutes ? content.durationMinutes : '-'}분
+                                                        </small>
+                                                    </label>
+                                                </c:forEach>
+                                            </c:when>
+                                            <c:otherwise>
+                                                <p style="color: #999; padding: 20px; text-align: center;">사용 중인 콘텐츠가 없습니다.<br/><small>콘텐츠 관리에서 콘텐츠를 등록해주세요.</small></p>
+                                            </c:otherwise>
+                                        </c:choose>
                                     </div>
                                 </div>
                                 
@@ -300,7 +256,7 @@
                         </form>
                     </div>
                 </div>
-                <% } %>
+                </c:if>
                 
             </div>
         </c:if>
@@ -309,7 +265,7 @@
             <div class="alert alert-error">
                 강의 정보를 찾을 수 없습니다.
             </div>
-            <a href="<%= request.getContextPath() %>/lecture/list" class="btn btn-secondary">목록으로 돌아가기</a>
+            <a href="${pageContext.request.contextPath}/lecture/list" class="btn btn-secondary">목록으로 돌아가기</a>
         </c:if>
         </div>
     </main>
@@ -317,7 +273,7 @@
 
 
     <script>
-        const contextPath = '<%= request.getContextPath() %>';
+        const contextPath = '${pageContext.request.contextPath}';
 
         function openContentModal(lectureId) {
             // JSP MVC 패턴: 이미 로드된 콘텐츠 목록 사용
