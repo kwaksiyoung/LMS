@@ -14,14 +14,19 @@ import java.util.List;
 public interface MenuMapper {
     
     /**
-     * 메뉴 조회 (ID로)
+     * 메뉴 조회 (ID + tenant_id로)
      */
-    MenuVO selectMenu(@Param("menuId") String menuId);
+    MenuVO selectMenu(MenuVO menuVO);
     
     /**
      * 메뉴 목록 조회
      */
     List<MenuVO> selectMenuList(MenuVO menuVO);
+    
+    /**
+     * 메뉴 목록 조회 (검색/페이징)
+     */
+    List<MenuVO> selectMenuListWithSearch(MenuVO menuVO);
     
     /**
      * 메뉴 등록
@@ -34,12 +39,17 @@ public interface MenuMapper {
     int updateMenu(MenuVO menuVO);
     
     /**
-     * 메뉴 삭제
+     * 메뉴 삭제 (논리적 삭제)
      */
-    int deleteMenu(@Param("menuId") String menuId);
+    int deleteMenu(MenuVO menuVO);
     
     /**
      * 메뉴 수 조회
      */
     int selectMenuCount(MenuVO menuVO);
+    
+    /**
+     * 메뉴 수 조회 (검색/페이징)
+     */
+    int selectMenuListWithSearchCount(MenuVO menuVO);
 }
