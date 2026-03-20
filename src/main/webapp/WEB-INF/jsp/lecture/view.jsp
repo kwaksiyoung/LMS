@@ -125,36 +125,23 @@
                     <c:if test="${not empty lecture.contents}">
                         <div class="content-list lecture-content-list">
                             <c:forEach var="content" items="${lecture.contents}" varStatus="status">
-                                <div class="content-item lecture-content-item" data-content-id="${content.contentId}">
-                                    <div class="content-order">
-                                        <strong>${status.index + 1}</strong>
-                                    </div>
-                                    <div class="content-header">
-                                        <div>
-                                            <span class="content-title">${content.contentTitle}</span>
-                                            <c:if test="${not empty content.contentType}">
-                                                <span class="badge badge-${content.contentType eq 'VIDEO' ? 'video' : 'document'}">
-                                                    <c:choose>
-                                                        <c:when test="${content.contentType eq 'VIDEO'}">동영상</c:when>
-                                                        <c:when test="${content.contentType eq 'DOCUMENT'}">문서</c:when>
-                                                        <c:when test="${content.contentType eq 'LINK'}">링크</c:when>
-                                                        <c:otherwise>${content.contentType}</c:otherwise>
-                                                    </c:choose>
-                                                </span>
+                                <div class="content-item lecture-content-item" data-content-id="${content.contentId}" style="padding: 15px; border: 1px solid #ddd; border-radius: 6px; margin-bottom: 12px;">
+                                    <div style="display: flex; align-items: center; gap: 15px;">
+                                        <div class="content-order" style="min-width: 40px;">
+                                            <strong style="font-size: 18px; color: #667eea;">${status.index + 1}</strong>
+                                        </div>
+                                        <div style="flex: 1;">
+                                            <c:if test="${not empty content.lectureContentTitle}">
+                                                <div style="font-weight: bold; font-size: 16px; color: #2c3e50; margin-bottom: 6px;">
+                                                    📌 ${content.lectureContentTitle}
+                                                </div>
+                                            </c:if>
+                                            <c:if test="${not empty content.durationMinutes}">
+                                                <div style="color: #666; font-size: 14px;">
+                                                    ⏱️ 재생 시간: <strong>${content.durationMinutes}분</strong>
+                                                </div>
                                             </c:if>
                                         </div>
-                                        <c:if test="${not empty content.lectureContentTitle}">
-                                        <div style="margin-top: 8px; padding-top: 8px; border-top: 1px solid #eee;">
-                                            <span style="font-weight: bold; color: #2c3e50;">📌 차시 제목: ${content.lectureContentTitle}</span>
-                                        </div>
-                                        </c:if>
-                                    </div>
-                                    <p class="content-desc">${content.contentDesc}</p>
-                                    <div class="content-meta">
-                                        <c:if test="${not empty content.durationMinutes}">
-                                            <span>⏱️ ${content.durationMinutes}분</span>
-                                        </c:if>
-                                        <span>📅 ${content.regDt}</span>
                                     </div>
                                     <c:if test="${isAdminUser}">
                                     <div class="content-actions">
@@ -216,14 +203,13 @@
                                     <div id="contentList" style="max-height: 300px; overflow-y: auto; border: 1px solid #ddd; border-radius: 5px; padding: 10px;">
                                         <c:choose>
                                             <c:when test="${not empty availableContents}">
-                                                <c:forEach var="content" items="${availableContents}">
-                                                    <label class="content-checkbox">
-                                                        <input type="radio" name="contentIds" value="${content.contentId}" />
-                                                        <strong>${not empty content.contentTitle ? content.contentTitle : '(제목 없음)'}</strong> <br/>
-                                                        <small style="color: #666;">${content.contentDesc}</small>
-                                                        <small style="color: #999; display: block; margin-top: 5px;">
-                                                            유형: ${not empty content.contentType ? content.contentType : '-'} | 시간: ${not empty content.durationMinutes ? content.durationMinutes : '-'}분
-                                                        </small>
+                                                 <c:forEach var="content" items="${availableContents}">
+                                                    <label style="display: block; padding: 10px; margin-bottom: 8px; border: 1px solid #e0e0e0; border-radius: 4px; cursor: pointer; transition: background 0.2s;">
+                                                        <input type="radio" name="contentIds" value="${content.contentId}" style="margin-right: 8px;" />
+                                                        <strong>${not empty content.contentTitle ? content.contentTitle : '(제목 없음)'}</strong>
+                                                        <c:if test="${not empty content.durationMinutes}">
+                                                            <span style="color: #999; margin-left: 10px;">⏱️ ${content.durationMinutes}분</span>
+                                                        </c:if>
                                                     </label>
                                                 </c:forEach>
                                             </c:when>
@@ -242,12 +228,7 @@
                                     <p style="color: #999; font-size: 12px; margin-top: 5px;">차시에 대한 구분 제목을 입력하면 학습 화면에서 표시됩니다.</p>
                                 </div>
 
-                                <!-- 차시 설명 입력 섹션 -->
-                                <div>
-                                    <label for="lectureContentDesc" style="display: block; margin-bottom: 10px; font-weight: bold;">차시 설명 (선택사항)</label>
-                                    <textarea id="lectureContentDesc" name="lectureContentDesc" placeholder="이 차시에 대한 간단한 설명을 입력하세요." 
-                                             style="width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 4px; box-sizing: border-box; height: 80px; resize: vertical;"></textarea>
-                                </div>
+
                             </div>
                             <div class="modal-footer">
                                 <button type="submit" class="btn btn-primary">선택한 차시 추가</button>
