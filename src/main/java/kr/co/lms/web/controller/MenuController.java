@@ -97,7 +97,14 @@ public class MenuController {
             return "redirect:/menu/list";
         }
         
+        // 현재 메뉴에 매핑된 역할 조회 (detail.jsp에서 필요)
+        RoleMenuVO roleMenuVO = new RoleMenuVO();
+        roleMenuVO.setMenuId(menuId);
+        roleMenuVO.setTenantId(tenantId);
+        List<String> selectedRoles = menuService.selectRolesByMenu(roleMenuVO);
+        
         model.addAttribute("menu", menu);
+        model.addAttribute("selectedRoles", selectedRoles);
         return "menu/detail";
     }
 
