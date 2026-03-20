@@ -293,13 +293,35 @@
         }
 
         function validateForm() {
+            // 모든 contentIds 라디오버튼 조사
+            const allRadios = document.querySelectorAll('input[name="contentIds"]');
+            console.log('===== validateForm() 호출 =====');
+            console.log('모든 라디오 버튼 개수:', allRadios.length);
+            allRadios.forEach((radio, idx) => {
+                console.log(`라디오 ${idx}: value=${radio.value}, checked=${radio.checked}`);
+            });
+            
+            // 선택된 라디오 찾기
             const selectedRadio = document.querySelector('input[name="contentIds"]:checked');
-            console.log('선택된 라디오:', selectedRadio); // 디버깅 로그
+            console.log('선택된 라디오:', selectedRadio);
+            
             if (!selectedRadio) {
+                console.warn('에러: 선택된 콘텐츠 없음');
                 alert('최소 1개의 콘텐츠를 선택하세요.');
                 return false;
             }
-            console.log('선택된 contentId:', selectedRadio.value); // 디버깅 로그
+            
+            // 폼 데이터 확인
+            const form = document.getElementById('contentForm');
+            const formData = new FormData(form);
+            console.log('폼 데이터:');
+            for (let [key, value] of formData.entries()) {
+                console.log(`  ${key}: ${value}`);
+            }
+            
+            console.log('선택된 contentId:', selectedRadio.value);
+            console.log('차시 제목:', document.getElementById('lectureContentTitle').value || '(없음)');
+            console.log('===== form 제출 진행 =====');
             return true;
         }
 
