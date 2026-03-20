@@ -41,7 +41,20 @@
                 <% } %>
             </li>
 
-            <!-- 추가 메뉴 (확장 가능) -->
+            <!-- 메뉴 관리 (관리자만) -->
+            <% if (isAdminUser) { %>
+            <li class="nav-item">
+                <a href="<%= request.getContextPath() %>/menu/list" class="nav-link">
+                    ⚙️ 메뉴 관리
+                </a>
+                <ul class="nav-submenu">
+                    <li><a href="<%= request.getContextPath() %>/menu/list">메뉴 목록</a></li>
+                    <li><a href="<%= request.getContextPath() %>/menu/create">새 메뉴 등록</a></li>
+                </ul>
+            </li>
+            <% } %>
+
+            <!-- 대시보드 (관리자만) -->
             <% if (isAdminUser) { %>
             <li class="nav-item">
                 <a href="<%= request.getContextPath() %>/dashboard" class="nav-link">
