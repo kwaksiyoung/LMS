@@ -292,45 +292,77 @@ public class LectureController {
     }
     logger.info("검증 통과: {} 개 콘텐츠 선택됨", contentIdList.size());
     
-     // 4️⃣ 비즈니스 로직
-      try {
-        // 현재 최대 contentOrder 조회
-        LectureVO lecture = lectureService.selectLectureWithContentsOptimized(lectureId);
-        int maxOrder = 0;
-        if (lecture != null && lecture.getContents() != null) {
-          for (ContentVO content : lecture.getContents()) {
-            if (content.getContentOrder() != null && content.getContentOrder() >= maxOrder) {
-              maxOrder = content.getContentOrder() + 1;
-            }
-          }
-        }
-        logger.info("현재 최대 contentOrder: {}", maxOrder);
-        
-        int successCount = 0;
-        for (String contentId : contentIdList) {
-          logger.info("차시 저장 중: contentId={}, order={}", contentId, maxOrder);
-          int result = lectureService.addContentToLecture(
-              lectureId,
-              contentId,
-              tenantId,
-              maxOrder,  // 최대 order + 1로 설정 (새 차시를 맨 뒤에 추가)
-              lectureContentTitle,
-              lectureContentDesc
-          );
-          if (result > 0) {
-            successCount++;
-            maxOrder++;  // 다음 차시를 위해 order 증가
-            logger.info("차시 저장 성공: contentId={}", contentId);
-          } else {
-            logger.warn("차시 저장 실패: contentId={}", contentId);
-          }
-        }
-      
-      if (successCount == 0) {
-        logger.warn("차시 추가 실패: DB 저장 실패");
-        model.addAttribute("errorMessage", "차시 추가에 실패했습니다.");
-        return "redirect:/lecture/view?lectureId=" + lectureId;
-      }
+      // 4️⃣ 비즈니스 로직
+       try {
+         // 현재 강의 정보 조회 (최대 order 계산 + 중복 확인용)
+         LectureVO lecture = lectureService.selectLectureWithContentsOptimized(lectureId);
+         int maxOrder = 0;
+         List<String> existingContentIds = new ArrayList<>();
+         
+         if (lecture != null && lecture.getContents() != null) {
+           for (ContentVO content : lecture.getContents()) {
+             // 최대 order 계산
+             if (content.getContentOrder() != null && content.getContentOrder() >= maxOrder) {
+               maxOrder = content.getContentOrder() + 1;
+             }
+             // 기존 contentId 수집 (중복 체크용)
+             if (content.getContentId() != null) {
+               existingContentIds.add(content.getContentId());
+             }
+           }
+         }
+         logger.info("현재 최대 contentOrder: {}, 기존 콘텐츠 수: {}", maxOrder, existingContentIds.size());
+         
+         // 중복 체크
+         List<String> duplicateIds = new ArrayList<>();
+         List<String> newContentIds = new ArrayList<>();
+         for (String contentId : contentIdList) {
+           if (existingContentIds.contains(contentId)) {
+             duplicateIds.add(contentId);
+             logger.warn("중복 콘텐츠 (이미 추가됨): contentId={}", contentId);
+           } else {
+             newContentIds.add(contentId);
+           }
+         }
+         
+         // 중복이 있으면 경고 메시지
+         if (!duplicateIds.isEmpty()) {
+           if (newContentIds.isEmpty()) {
+             // 모두 중복이면 에러
+             logger.warn("모든 콘텐츠가 이미 추가됨: duplicateIds={}", duplicateIds);
+             model.addAttribute("errorMessage", "선택한 콘텐츠가 이미 추가되어 있습니다.");
+             return "redirect:/lecture/view?lectureId=" + lectureId;
+           } else {
+             // 일부만 중복이면 경고만 표시
+             logger.warn("일부 콘텐츠가 이미 추가됨 (무시하고 진행): duplicateIds={}", duplicateIds);
+           }
+         }
+         
+         int successCount = 0;
+         for (String contentId : newContentIds) {
+           logger.info("차시 저장 중: contentId={}, order={}", contentId, maxOrder);
+           int result = lectureService.addContentToLecture(
+               lectureId,
+               contentId,
+               tenantId,
+               maxOrder,  // 최대 order + 1로 설정 (새 차시를 맨 뒤에 추가)
+               lectureContentTitle,
+               lectureContentDesc
+           );
+           if (result > 0) {
+             successCount++;
+             maxOrder++;  // 다음 차시를 위해 order 증가
+             logger.info("차시 저장 성공: contentId={}", contentId);
+           } else {
+             logger.warn("차시 저장 실패: contentId={}", contentId);
+           }
+         }
+       
+       if (successCount == 0) {
+         logger.warn("차시 추가 실패: DB 저장 실패");
+         model.addAttribute("errorMessage", "차시 추가에 실패했습니다.");
+         return "redirect:/lecture/view?lectureId=" + lectureId;
+       }
       
       logger.info("차시 추가 성공: lectureId={}, count={}", lectureId, successCount);
       
