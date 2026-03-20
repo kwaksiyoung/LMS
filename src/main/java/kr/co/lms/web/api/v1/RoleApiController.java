@@ -51,10 +51,23 @@ public class RoleApiController {
    * GET /api/v1/roles/{roleCd}
    */
   @GetMapping("/{roleCd}")
-  public ResponseEntity<ApiResponse<RoleVO>> getRole(@PathVariable String roleCd) {
+  public ResponseEntity<ApiResponse<RoleVO>> getRole(
+      @PathVariable String roleCd,
+      HttpServletRequest request) {
     logger.info("역할 상세 조회 API: roleCd={}", roleCd);
 
-    RoleVO role = roleService.selectRole(roleCd);
+    // JWT 토큰에서 tenantId 추출
+    String tenantId = ApiAuthUtil.getTenantId(request);
+    if (tenantId == null || tenantId.isEmpty()) {
+      return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+          .body(ApiResponse.error("테넌트 정보를 찾을 수 없습니다."));
+    }
+
+    RoleVO roleVO = new RoleVO();
+    roleVO.setRoleCd(roleCd);
+    roleVO.setTenantId(tenantId);
+    
+    RoleVO role = roleService.selectRole(roleVO);
     if (role == null) {
       return ResponseEntity.status(HttpStatus.NOT_FOUND)
           .body(ApiResponse.error("역할을 찾을 수 없습니다: " + roleCd));
@@ -132,7 +145,18 @@ public class RoleApiController {
 
     logger.info("역할 삭제 API: roleCd={}", roleCd);
 
-    int result = roleService.deleteRole(roleCd);
+    // JWT 토큰에서 tenantId 추출
+    String tenantId = ApiAuthUtil.getTenantId(request);
+    if (tenantId == null || tenantId.isEmpty()) {
+      return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+          .body(ApiResponse.error("테넌트 정보를 찾을 수 없습니다."));
+    }
+
+    RoleVO roleVO = new RoleVO();
+    roleVO.setRoleCd(roleCd);
+    roleVO.setTenantId(tenantId);
+
+    int result = roleService.deleteRole(roleVO);
     if (result == 0) {
       return ResponseEntity.status(HttpStatus.NOT_FOUND)
           .body(ApiResponse.error("삭제할 역할을 찾을 수 없습니다."));

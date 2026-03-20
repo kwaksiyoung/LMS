@@ -51,10 +51,23 @@ public class MenuApiController {
    * GET /api/v1/menus/{menuId}
    */
   @GetMapping("/{menuId}")
-  public ResponseEntity<ApiResponse<MenuVO>> getMenu(@PathVariable String menuId) {
+  public ResponseEntity<ApiResponse<MenuVO>> getMenu(
+      @PathVariable String menuId,
+      HttpServletRequest request) {
     logger.info("메뉴 상세 조회 API: menuId={}", menuId);
 
-    MenuVO menu = menuService.selectMenu(menuId);
+    // JWT 토큰에서 tenantId 추출
+    String tenantId = ApiAuthUtil.getTenantId(request);
+    if (tenantId == null || tenantId.isEmpty()) {
+      return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+          .body(ApiResponse.error("테넌트 정보를 찾을 수 없습니다."));
+    }
+
+    MenuVO menuVO = new MenuVO();
+    menuVO.setMenuId(menuId);
+    menuVO.setTenantId(tenantId);
+    
+    MenuVO menu = menuService.selectMenu(menuVO);
     if (menu == null) {
       return ResponseEntity.status(HttpStatus.NOT_FOUND)
           .body(ApiResponse.error("메뉴를 찾을 수 없습니다: " + menuId));
@@ -132,7 +145,18 @@ public class MenuApiController {
 
     logger.info("메뉴 삭제 API: menuId={}", menuId);
 
-    int result = menuService.deleteMenu(menuId);
+    // JWT 토큰에서 tenantId 추출
+    String tenantId = ApiAuthUtil.getTenantId(request);
+    if (tenantId == null || tenantId.isEmpty()) {
+      return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+          .body(ApiResponse.error("테넌트 정보를 찾을 수 없습니다."));
+    }
+
+    MenuVO menuVO = new MenuVO();
+    menuVO.setMenuId(menuId);
+    menuVO.setTenantId(tenantId);
+
+    int result = menuService.deleteMenu(menuVO);
     if (result == 0) {
       return ResponseEntity.status(HttpStatus.NOT_FOUND)
           .body(ApiResponse.error("삭제할 메뉴를 찾을 수 없습니다."));
