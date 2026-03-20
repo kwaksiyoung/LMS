@@ -436,6 +436,16 @@
                 </div>
                 
                 <div class="form-group">
+                    <label for="useYn">사용 여부 <span class="required">*</span></label>
+                    <select id="useYn" name="useYn" required>
+                        <option value="">선택하세요</option>
+                        <option value="Y" ${menu.useYn == 'Y' ? 'selected' : ''}>사용</option>
+                        <option value="N" ${menu.useYn == 'N' ? 'selected' : ''}>미사용</option>
+                    </select>
+                    <div class="form-help">메뉴를 사용 또는 미사용으로 설정할 수 있습니다.</div>
+                </div>
+                
+                <div class="form-group">
                     <label for="roleSelect">접근 가능한 역할 <span class="required">*</span></label>
                     <div class="checkbox-group">
                         <c:forEach var="role" items="${roles}">

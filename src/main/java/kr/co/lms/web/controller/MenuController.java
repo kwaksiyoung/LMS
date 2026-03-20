@@ -312,7 +312,7 @@ public class MenuController {
                 }
                 
                 logger.info("메뉴 수정 성공: menuId={}", menuId);
-                return "redirect:/menu/" + menuId;
+                return "redirect:/menu/list";
             } else {
                 logger.warn("메뉴 수정 실패: menuId={}", menuId);
                 model.addAttribute("errorMessage", "메뉴 수정에 실패했습니다.");
