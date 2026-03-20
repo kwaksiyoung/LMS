@@ -4,12 +4,12 @@
 <mapper namespace="kr.co.lms.mapper.MenuMapper">
     
     <!-- 메뉴 조회 (tenant_id 포함) -->
+    <!-- 주의: use_yn 조건 없음 - 수정/삭제를 위해 미사용 메뉴도 조회 필요 -->
     <select id="selectMenu" parameterType="MenuVO" resultType="MenuVO">
         SELECT menu_id, tenant_id, menu_nm, menu_url, menu_icon, sort_order, parent_menu_id, use_yn, reg_dt, upd_dt
         FROM tb_menu
         WHERE menu_id = #{menuId}
         AND tenant_id = #{tenantId}
-        AND use_yn = 'Y'
     </select>
     
     <!-- 메뉴 목록 조회 -->
