@@ -8,6 +8,10 @@ models:
 
 system_prompt: ./prompts/system.md
 
+security:
+  block:
+    - application.properties
+    
 context:
   include:
     - src/main/java/**
