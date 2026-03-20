@@ -41,6 +41,7 @@
             <result column="content_reg_dt" property="regDt"/>
             <result column="lecture_content_title" property="lectureContentTitle"/>
             <result column="lecture_content_desc" property="lectureContentDesc"/>
+            <result column="content_order" property="contentOrder"/>
         </collection>
     </resultMap>
 
@@ -118,14 +119,14 @@
      <!-- ============================================
           최적화된 강의 + 콘텐츠 조회 (LEFT JOIN - N+1 해결)
           ============================================ -->
-    <select id="selectLectureWithContentsOptimized" parameterType="map" resultMap="lectureWithContentsMap">
+     <select id="selectLectureWithContentsOptimized" parameterType="map" resultMap="lectureWithContentsMap">
         SELECT 
             l.lecture_id, l.tenant_id, l.lecture_nm, l.lecture_desc, 
             l.duration_minutes, l.lecture_type, l.use_yn, l.reg_dt, l.upd_dt,
             c.content_id, c.content_nm as content_title, c.content_type, 
             c.content_desc, c.duration_minutes as content_duration_minutes, 
             c.reg_dt as content_reg_dt,
-            lc.lecture_content_title, lc.lecture_content_desc
+            lc.lecture_content_title, lc.lecture_content_desc, lc.content_order
         FROM tb_lecture l
         LEFT JOIN tb_lecture_content lc ON l.lecture_id = lc.lecture_id AND l.tenant_id = lc.tenant_id
         LEFT JOIN tb_content c ON lc.content_id = c.content_id AND lc.tenant_id = c.tenant_id
