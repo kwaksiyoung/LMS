@@ -8,6 +8,8 @@ import kr.co.lms.vo.RoleMenuVO;
 import kr.co.lms.web.exception.MenuNotFoundException;
 import kr.co.lms.web.exception.MenuHasChildrenException;
 import kr.co.lms.web.exception.MenuDeletionException;
+import kr.co.lms.web.exception.DuplicateMenuException;
+import kr.co.lms.web.exception.ParentMenuNotFoundException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import lombok.RequiredArgsConstructor;
@@ -62,9 +64,54 @@ public class MenuServiceImpl implements MenuService {
 
     /**
      * 메뉴 등록
+     * 
+     * 검증:
+     * 1. menuVO null 체크
+     * 2. menuId null/empty 체크
+     * 3. tenantId null/empty 체크
+     * 4. 중복 메뉴 체크
+     * 5. 부모 메뉴 존재 여부 체크
      */
     @Override
     public int insertMenu(MenuVO menuVO) {
+        // 1단계: Null 검증
+        if (menuVO == null) {
+            logger.warn("메뉴 등록 실패: menuVO가 null입니다.");
+            throw new IllegalArgumentException("메뉴 정보(menuVO)는 필수입니다.");
+        }
+        
+        if (menuVO.getMenuId() == null || menuVO.getMenuId().trim().isEmpty()) {
+            logger.warn("메뉴 등록 실패: menuId가 없습니다.");
+            throw new IllegalArgumentException("메뉴 ID는 필수입니다.");
+        }
+        
+        if (menuVO.getTenantId() == null || menuVO.getTenantId().trim().isEmpty()) {
+            logger.warn("메뉴 등록 실패: tenantId가 없습니다.");
+            throw new IllegalArgumentException("테넌트 ID는 필수입니다.");
+        }
+        
+        // 2단계: 중복 확인
+        MenuVO existingMenu = menuMapper.selectMenu(menuVO);
+        if (existingMenu != null) {
+            logger.warn("메뉴 등록 실패: 중복된 메뉴 (menuId={}, tenantId={})", 
+                       menuVO.getMenuId(), menuVO.getTenantId());
+            throw new DuplicateMenuException("이미 등록된 메뉴입니다.");
+        }
+        
+        // 3단계: 부모 메뉴 검증 (부모가 설정된 경우만)
+        if (menuVO.getParentMenuId() != null && !menuVO.getParentMenuId().trim().isEmpty()) {
+            MenuVO parentMenu = new MenuVO();
+            parentMenu.setMenuId(menuVO.getParentMenuId());
+            parentMenu.setTenantId(menuVO.getTenantId());
+            MenuVO parent = menuMapper.selectMenu(parentMenu);
+            
+            if (parent == null) {
+                logger.warn("메뉴 등록 실패: 부모 메뉴를 찾을 수 없음 (parentMenuId={}, tenantId={})", 
+                           menuVO.getParentMenuId(), menuVO.getTenantId());
+                throw new ParentMenuNotFoundException("부모 메뉴를 찾을 수 없습니다.");
+            }
+        }
+        
         logger.info("메뉴 등록: menuId={}, tenantId={}", menuVO.getMenuId(), menuVO.getTenantId());
         int result = menuMapper.insertMenu(menuVO);
         if (result > 0) {
@@ -77,9 +124,60 @@ public class MenuServiceImpl implements MenuService {
 
     /**
      * 메뉴 수정
+     * 
+     * 검증:
+     * 1. menuVO null 체크
+     * 2. menuId null/empty 체크
+     * 3. tenantId null/empty 체크
+     * 4. 메뉴 존재 여부 체크
+     * 5. 부모 메뉴 존재 여부 체크
      */
     @Override
     public int updateMenu(MenuVO menuVO) {
+        // 1단계: Null 검증
+        if (menuVO == null) {
+            logger.warn("메뉴 수정 실패: menuVO가 null입니다.");
+            throw new IllegalArgumentException("메뉴 정보(menuVO)는 필수입니다.");
+        }
+        
+        if (menuVO.getMenuId() == null || menuVO.getMenuId().trim().isEmpty()) {
+            logger.warn("메뉴 수정 실패: menuId가 없습니다.");
+            throw new IllegalArgumentException("메뉴 ID는 필수입니다.");
+        }
+        
+        if (menuVO.getTenantId() == null || menuVO.getTenantId().trim().isEmpty()) {
+            logger.warn("메뉴 수정 실패: tenantId가 없습니다.");
+            throw new IllegalArgumentException("테넌트 ID는 필수입니다.");
+        }
+        
+        // 2단계: 메뉴 존재 확인
+        MenuVO existingMenu = menuMapper.selectMenu(menuVO);
+        if (existingMenu == null) {
+            logger.warn("메뉴 수정 실패: 메뉴를 찾을 수 없음 (menuId={}, tenantId={})", 
+                       menuVO.getMenuId(), menuVO.getTenantId());
+            throw new MenuNotFoundException("메뉴를 찾을 수 없습니다.");
+        }
+        
+        // 3단계: 부모 메뉴 검증 (부모가 변경된 경우)
+        if (menuVO.getParentMenuId() != null && !menuVO.getParentMenuId().trim().isEmpty()) {
+            // 자신을 부모로 지정할 수 없음
+            if (menuVO.getMenuId().equals(menuVO.getParentMenuId())) {
+                logger.warn("메뉴 수정 실패: 자신을 부모로 지정할 수 없음 (menuId={})", menuVO.getMenuId());
+                throw new IllegalArgumentException("자신을 부모 메뉴로 지정할 수 없습니다.");
+            }
+            
+            MenuVO parentMenu = new MenuVO();
+            parentMenu.setMenuId(menuVO.getParentMenuId());
+            parentMenu.setTenantId(menuVO.getTenantId());
+            MenuVO parent = menuMapper.selectMenu(parentMenu);
+            
+            if (parent == null) {
+                logger.warn("메뉴 수정 실패: 부모 메뉴를 찾을 수 없음 (parentMenuId={}, tenantId={})", 
+                           menuVO.getParentMenuId(), menuVO.getTenantId());
+                throw new ParentMenuNotFoundException("부모 메뉴를 찾을 수 없습니다.");
+            }
+        }
+        
         logger.info("메뉴 수정: menuId={}, tenantId={}", menuVO.getMenuId(), menuVO.getTenantId());
         int result = menuMapper.updateMenu(menuVO);
         if (result > 0) {
